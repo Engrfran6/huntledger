@@ -1,17 +1,7 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { useState } from "react"
-import { useAuthState } from "@/lib/auth-hooks"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useToast } from "@/components/ui/use-toast"
-import { updateEmail, updatePassword, deleteUser } from "firebase/auth"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,98 +12,96 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from '@/components/ui/alert-dialog';
+import {Button} from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {Switch} from '@/components/ui/switch';
+import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {useAuthState} from '@/lib/auth-hooks';
+import {deleteUser, updateEmail, updatePassword} from 'firebase/auth';
+import {useState} from 'react';
+import {toast} from 'sonner';
 
 export default function SettingsPage() {
-  const { user } = useAuthState()
-  const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState(false)
+  const {user} = useAuthState();
 
-  const [email, setEmail] = useState(user?.email || "")
-  const [currentPassword, setCurrentPassword] = useState("")
-  const [newPassword, setNewPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [emailNotifications, setEmailNotifications] = useState(true)
-  const [weeklyDigest, setWeeklyDigest] = useState(true)
-  const [applicationReminders, setApplicationReminders] = useState(true)
+  const [email, setEmail] = useState(user?.email || '');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [weeklyDigest, setWeeklyDigest] = useState(true);
+  const [applicationReminders, setApplicationReminders] = useState(true);
 
   const handleUpdateEmail = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!user) return
+    e.preventDefault();
+    if (!user) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      await updateEmail(user, email)
-      toast({
-        title: "Email updated",
-        description: "Your email has been updated successfully.",
-      })
+      await updateEmail(user, email);
+      toast.success('Email updated', {description: 'Your email has been updated successfully.'});
     } catch (error: any) {
-      toast({
-        title: "Error updating email",
-        description: error.message,
-        variant: "destructive",
-      })
+      toast.error('Error updating email', {description: error.message});
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!user) return
+    e.preventDefault();
+    if (!user) return;
 
     if (newPassword !== confirmPassword) {
-      toast({
-        title: "Passwords don't match",
-        description: "New password and confirm password must match.",
-        variant: "destructive",
-      })
-      return
+      toast.error("Passwords don't match", {
+        description: 'New password and confirm password must match.',
+      });
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      await updatePassword(user, newPassword)
-      toast({
-        title: "Password updated",
-        description: "Your password has been updated successfully.",
-      })
-      setCurrentPassword("")
-      setNewPassword("")
-      setConfirmPassword("")
+      await updatePassword(user, newPassword);
+      toast.success('Password updated', {
+        description: 'Your password has been updated successfully.',
+      });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
     } catch (error: any) {
-      toast({
-        title: "Error updating password",
-        description: error.message,
-        variant: "destructive",
-      })
+      toast.error('Error updating password', {description: error.message});
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleDeleteAccount = async () => {
-    if (!user) return
+    if (!user) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      await deleteUser(user)
-      toast({
-        title: "Account deleted",
-        description: "Your account has been deleted successfully.",
-      })
+      await deleteUser(user);
+      toast.success('Account deleted', {
+        description: 'Your account has been deleted successfully.',
+      });
     } catch (error: any) {
-      toast({
-        title: "Error deleting account",
-        description: error.message,
-        variant: "destructive",
-      })
+      toast.error('Error deleting account', {description: error.message});
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -138,12 +126,18 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
               </CardContent>
               <CardFooter>
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Updating..." : "Update Email"}
+                  {isLoading ? 'Updating...' : 'Update Email'}
                 </Button>
               </CardFooter>
             </form>
@@ -189,7 +183,7 @@ export default function SettingsPage() {
               </CardContent>
               <CardFooter>
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Updating..." : "Update Password"}
+                  {isLoading ? 'Updating...' : 'Update Password'}
                 </Button>
               </CardFooter>
             </form>
@@ -214,13 +208,15 @@ export default function SettingsPage() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete your account and remove your data from
-                      our servers.
+                      This action cannot be undone. This will permanently delete your account and
+                      remove your data from our servers.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteAccount} className="bg-red-600 hover:bg-red-700">
+                    <AlertDialogAction
+                      onClick={handleDeleteAccount}
+                      className="bg-red-600 hover:bg-red-700">
                       Delete
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -244,7 +240,11 @@ export default function SettingsPage() {
                     Receive email notifications for important updates
                   </span>
                 </Label>
-                <Switch id="email-notifications" checked={emailNotifications} onCheckedChange={setEmailNotifications} />
+                <Switch
+                  id="email-notifications"
+                  checked={emailNotifications}
+                  onCheckedChange={setEmailNotifications}
+                />
               </div>
               <div className="flex items-center justify-between space-x-2">
                 <Label htmlFor="weekly-digest" className="flex flex-col space-y-1">
@@ -253,7 +253,11 @@ export default function SettingsPage() {
                     Receive a weekly summary of your job search progress
                   </span>
                 </Label>
-                <Switch id="weekly-digest" checked={weeklyDigest} onCheckedChange={setWeeklyDigest} />
+                <Switch
+                  id="weekly-digest"
+                  checked={weeklyDigest}
+                  onCheckedChange={setWeeklyDigest}
+                />
               </div>
               <div className="flex items-center justify-between space-x-2">
                 <Label htmlFor="application-reminders" className="flex flex-col space-y-1">
@@ -304,5 +308,5 @@ export default function SettingsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

@@ -1,20 +1,5 @@
-"use client"
+'use client';
 
-import type React from "react"
-
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useToast } from "@/components/ui/use-toast"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { fetchJob, updateJob, deleteJob } from "@/lib/api"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { ArrowLeft, Loader2, Trash } from "lucide-react"
-import Link from "next/link"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,104 +10,153 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import type { Job } from "@/lib/types"
+} from '@/components/ui/alert-dialog';
+import {Button} from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {Textarea} from '@/components/ui/textarea';
+import {deleteJob, fetchJob, updateJob} from '@/lib/api';
+import {yupResolver} from '@hookform/resolvers/yup';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {ArrowLeft, Loader2, Trash} from 'lucide-react';
+import Link from 'next/link';
+import {useRouter} from 'next/navigation';
+import {useEffect} from 'react';
+import {Controller, useForm} from 'react-hook-form';
+import {toast} from 'sonner';
+import * as yup from 'yup';
 
-export default function EditJobPage({ params }: { params: { id: string } }) {
-  const router = useRouter()
-  const { toast } = useToast()
-  const queryClient = useQueryClient()
-  const [formData, setFormData] = useState<Job | null>(null)
+type Job = {
+  company: string;
+  position: string;
+  location?: string;
+  status: string;
+  url?: string;
+  salary?: string;
+  appliedDate: string;
+  notes?: string;
+};
 
-  const { data: job, isLoading } = useQuery({
-    queryKey: ["job", params.id],
+const schema = yup.object().shape({
+  company: yup.string().required('Company name is required'),
+  position: yup.string().required('Job title is required'),
+  location: yup.string().optional(),
+  status: yup.string().required('Status is required'),
+  url: yup.string().url('Enter a valid URL').optional(),
+  salary: yup.string().optional(),
+  appliedDate: yup.string().required('Date applied is required'),
+  notes: yup.string().optional(),
+});
+
+export default function EditJobPage({params}: {params: {id: string}}) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: {errors},
+  } = useForm<Job>({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      company: '',
+      position: '',
+      location: '',
+      status: 'applied',
+      url: '',
+      salary: '',
+      appliedDate: '',
+      notes: '',
+    },
+  });
+
+  const {data: job, isLoading} = useQuery({
+    queryKey: ['job', params.id],
     queryFn: () => fetchJob(params.id),
-  })
+  });
 
   useEffect(() => {
     if (job) {
-      setFormData(job)
+      Object.entries(job).forEach(([key, value]) => {
+        if (key === 'appliedDate' && value) {
+          setValue('appliedDate', (value as string).split('T')[0]);
+        } else {
+          setValue(key as keyof Job, value);
+        }
+      });
     }
-  }, [job])
+  }, [job, setValue]);
 
   const updateMutation = useMutation({
     mutationFn: updateJob,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["jobs"] })
-      queryClient.invalidateQueries({ queryKey: ["job", params.id] })
-      toast({
-        title: "Job updated successfully",
-        description: "Your job application has been updated.",
-      })
-      router.push("/dashboard")
+      queryClient.invalidateQueries({queryKey: ['jobs']});
+      queryClient.invalidateQueries({queryKey: ['job', params.id]});
+      toast.success('Job updated successfully', {
+        description: 'Your job application has been updated.',
+      });
+      router.push('/dashboard');
     },
     onError: (error: any) => {
-      toast({
-        title: "Error updating job",
-        description: error.message,
-        variant: "destructive",
-      })
+      toast.error('Error updating job', {description: error.message});
     },
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: deleteJob,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["jobs"] })
-      toast({
-        title: "Job deleted successfully",
-        description: "Your job application has been removed from your tracker.",
-      })
-      router.push("/dashboard")
+      queryClient.invalidateQueries({queryKey: ['jobs']});
+      toast.success('Job deleted successfully', {
+        description: 'Your job application has been removed from your tracker.',
+      });
+      router.push('/dashboard');
     },
     onError: (error: any) => {
-      toast({
-        title: "Error deleting job",
-        description: error.message,
-        variant: "destructive",
-      })
+      toast.error('Error deleting job', {description: error.message});
     },
-  })
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (!formData) return
-    const { name, value } = e.target
-    setFormData((prev) => (prev ? { ...prev, [name]: value } : null))
-  }
-
-  const handleSelectChange = (name: string, value: string) => {
-    if (!formData) return
-    setFormData((prev) => (prev ? { ...prev, [name]: value } : null))
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (formData) {
-      updateMutation.mutate({ id: params.id, ...formData })
-    }
-  }
+  const onSubmit = (data: Job) => {
+    updateMutation.mutate({id: params.id, ...data});
+  };
 
   const handleDelete = () => {
-    deleteMutation.mutate(params.id)
-  }
+    deleteMutation.mutate(params.id);
+  };
 
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
       </div>
-    )
+    );
   }
 
-  if (!formData) {
+  if (!job) {
     return (
       <div className="flex h-full flex-col items-center justify-center">
         <p className="text-lg font-medium">Job not found</p>
-        <Button onClick={() => router.push("/dashboard")} variant="link" className="mt-2">
+        <Button onClick={() => router.push('/dashboard')} variant="link" className="mt-2">
           Return to Dashboard
         </Button>
       </div>
-    )
+    );
   }
 
   return (
@@ -130,8 +164,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
       <div className="mb-6">
         <Link
           href="/dashboard"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-        >
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Dashboard
         </Link>
@@ -153,7 +186,8 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete this job application from your tracker.
+                  This action cannot be undone. This will permanently delete this job application
+                  from your tracker.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -165,105 +199,136 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             </AlertDialogContent>
           </AlertDialog>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+
+        <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="company">Company Name</Label>
-                <Input id="company" name="company" value={formData.company} onChange={handleChange} required />
+                <Controller
+                  name="company"
+                  control={control}
+                  render={({field}) => <Input {...field} id="company" />}
+                />
+                {errors.company && <p className="text-sm text-red-500">{errors.company.message}</p>}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="position">Job Title</Label>
-                <Input id="position" name="position" value={formData.position} onChange={handleChange} required />
+                <Controller
+                  name="position"
+                  control={control}
+                  render={({field}) => <Input {...field} id="position" />}
+                />
+                {errors.position && (
+                  <p className="text-sm text-red-500">{errors.position.message}</p>
+                )}
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
+                <Controller
                   name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                  placeholder="Remote, US, etc."
+                  control={control}
+                  render={({field}) => (
+                    <Input {...field} id="location" placeholder="Remote, US, etc." />
+                  )}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
-                <Select value={formData.status} onValueChange={(value) => handleSelectChange("status", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="applied">Applied</SelectItem>
-                    <SelectItem value="interview">Interview</SelectItem>
-                    <SelectItem value="offer">Offer</SelectItem>
-                    <SelectItem value="rejected">Rejected</SelectItem>
-                    <SelectItem value="withdrawn">Withdrawn</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({field}) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="applied">Applied</SelectItem>
+                        <SelectItem value="interview">Interview</SelectItem>
+                        <SelectItem value="offer">Offer</SelectItem>
+                        <SelectItem value="rejected">Rejected</SelectItem>
+                        <SelectItem value="withdrawn">Withdrawn</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="url">Job URL</Label>
-                <Input
-                  id="url"
+                <Controller
                   name="url"
-                  type="url"
-                  value={formData.url || ""}
-                  onChange={handleChange}
-                  placeholder="https://example.com/job"
+                  control={control}
+                  render={({field}) => (
+                    <Input {...field} id="url" type="url" placeholder="https://example.com/job" />
+                  )}
                 />
+                {errors.url && <p className="text-sm text-red-500">{errors.url.message}</p>}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="salary">Salary Range</Label>
-                <Input
-                  id="salary"
+                <Controller
                   name="salary"
-                  value={formData.salary || ""}
-                  onChange={handleChange}
-                  placeholder="$80,000 - $100,000"
+                  control={control}
+                  render={({field}) => (
+                    <Input {...field} id="salary" placeholder="$80,000 - $100,000" />
+                  )}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="appliedDate">Date Applied</Label>
-              <Input
-                id="appliedDate"
+              <Controller
                 name="appliedDate"
-                type="date"
-                value={formData.appliedDate?.split("T")[0] || ""}
-                onChange={handleChange}
-                required
+                control={control}
+                render={({field}) => <Input {...field} id="appliedDate" type="date" />}
               />
+              {errors.appliedDate && (
+                <p className="text-sm text-red-500">{errors.appliedDate.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="notes">Notes</Label>
-              <Textarea
-                id="notes"
+              <Controller
                 name="notes"
-                value={formData.notes || ""}
-                onChange={handleChange}
-                placeholder="Add any notes about this application..."
-                className="min-h-[100px]"
+                control={control}
+                render={({field}) => (
+                  <Textarea
+                    {...field}
+                    id="notes"
+                    placeholder="Add any notes about this application..."
+                    className="min-h-[100px]"
+                  />
+                )}
               />
             </div>
           </CardContent>
+
           <CardFooter className="flex justify-between">
-            <Button type="button" variant="outline" onClick={() => router.push("/dashboard")}>
+            <Button type="button" variant="outline" onClick={() => router.push('/dashboard')}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-orange-600 hover:bg-orange-700" disabled={updateMutation.isPending}>
-              {updateMutation.isPending ? "Saving..." : "Save Changes"}
+            <Button
+              type="submit"
+              className="bg-orange-600 hover:bg-orange-700"
+              disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
             </Button>
           </CardFooter>
         </form>
       </Card>
     </div>
-  )
+  );
 }
