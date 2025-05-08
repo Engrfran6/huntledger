@@ -11,14 +11,13 @@ import './globals.css';
 const inter = Inter({subsets: ['latin']});
 
 export const metadata: Metadata = {
-  title: 'HuntLedger - Track Your Remote Job Applications',
+  title: 'HuntLedger - Track Your Remote Job Applications Effortlessly',
   description: 'A simple and effective way to track your remote job applications',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
-  themeColor: '#ffffff',
   openGraph: {
     title: 'HuntLedger - Track Your Remote Job Applications',
     description: 'A simple and effective way to track your remote job applications',

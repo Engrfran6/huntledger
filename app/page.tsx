@@ -1,6 +1,8 @@
 import CTA from '@/components/home/cta';
 import Features from '@/components/home/features';
+import FrequentlyAskedQuestions from '@/components/home/frequently-asked-questions';
 import Hero from '@/components/home/hero';
+import Testimonials from '@/components/home/testimonials';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 
@@ -12,11 +14,11 @@ export default function Home() {
         <Hero />
         <Features />
 
-        {/* <Testimonials /> */}
+        <Testimonials />
 
         {/* <Pricing /> */}
 
-        {/* <FrequentlyAskedQuestions /> */}
+        <FrequentlyAskedQuestions />
 
         <CTA />
       </main>

@@ -17,6 +17,7 @@ import {auth} from '@/lib/firebase';
 import {signOut} from 'firebase/auth';
 import {Bell, User} from 'lucide-react';
 import {useState} from 'react';
+import {UserTypeSwitcher} from '../user-type-switcher';
 
 export function Header() {
   const {user} = useAuthState();
@@ -31,8 +32,14 @@ export function Header() {
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
       <SidebarTrigger className="md:hidden" />
-      <div className="w-full md:w-auto">
-        <span className="text-xl text-orange-600 font-semibold">Welcome to HuntLedger!</span>
+      {/* <div className="w-full md:w-auto">
+        <span className="text-sm  md:text-xl text-orange-600 font-semibold">
+          Welcome to HuntLedger!
+        </span>
+      </div> */}
+
+      <div className="hidden md:block">
+        <UserTypeSwitcher />
       </div>
       <div className="ml-auto flex items-center gap-2">
         <ModeToggle />

@@ -21,6 +21,8 @@ import {Label} from '@/components/ui/label';
 
 import {auth} from '@/lib/firebase';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
+import {Eye, EyeOff} from 'lucide-react';
+import {useState} from 'react';
 import {toast} from 'sonner';
 
 const schema = yup.object().shape({
@@ -34,6 +36,7 @@ const schema = yup.object().shape({
 type FormData = yup.InferType<typeof schema>;
 
 export default function SignUpPage() {
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const {
@@ -74,13 +77,27 @@ export default function SignUpPage() {
                 type="email"
                 placeholder="name@example.com"
                 {...register('email')}
+                disabled={isSubmitting}
               />
               {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 relative">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...register('password')} />
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                {...register('password')}
+                className="pr-10"
+                disabled={isSubmitting}
+              />
               {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700">
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">

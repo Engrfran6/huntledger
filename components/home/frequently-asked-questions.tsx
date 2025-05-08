@@ -19,11 +19,11 @@ const FrequentlyAskedQuestions = () => {
               answer:
                 'Yes! Our basic plan is completely free and includes all the essential features you need to track your job applications. We offer premium plans with advanced features for power users.',
             },
-            {
-              question: 'Can I import my existing job applications?',
-              answer:
-                'Absolutely. HuntLedger allows you to import your job applications from CSV files or spreadsheets, making it easy to transition from your current tracking method.',
-            },
+            // {
+            //   question: 'Can I import my existing job applications?',
+            //   answer:
+            //     'Absolutely. HuntLedger allows you to import your job applications from CSV files or spreadsheets, making it easy to transition from your current tracking method.',
+            // },
             {
               question: 'Is my data secure?',
               answer:
@@ -34,11 +34,11 @@ const FrequentlyAskedQuestions = () => {
               answer:
                 'Yes! HuntLedger is fully responsive and works on all devices, including smartphones and tablets. You can track your job applications on the go.',
             },
-            {
-              question: 'How do I cancel my subscription?',
-              answer:
-                "You can cancel your subscription at any time from your account settings. If you cancel, you'll still have access to your premium features until the end of your billing period.",
-            },
+            // {
+            //   question: 'How do I cancel my subscription?',
+            //   answer:
+            //     "You can cancel your subscription at any time from your account settings. If you cancel, you'll still have access to your premium features until the end of your billing period.",
+            // },
           ].map((faq, i) => (
             <div key={i} className="rounded-lg border bg-background p-6">
               <h3 className="text-lg font-medium">{faq.question}</h3>
