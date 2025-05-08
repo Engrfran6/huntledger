@@ -29,6 +29,37 @@ export interface Client {
   createdAt?: any;
 }
 
+export interface Subcontractor {
+  id: string;
+  userId: string; // ID of the main freelancer
+  name: string;
+  email?: string;
+  phone?: string;
+  expertise: string;
+  rate?: string;
+  notes?: string;
+  createdAt?: any;
+}
+
+export interface Task {
+  id: string;
+  userId: string; // ID of the main freelancer
+  clientId: string;
+  subcontractorId?: string;
+  title: string;
+  description?: string;
+  status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
+  priority: 'low' | 'medium' | 'high';
+  startDate?: string;
+  dueDate?: string;
+  completedDate?: string;
+  budget?: string;
+  paymentStatus?: 'unpaid' | 'partial' | 'paid';
+  paymentAmount?: string;
+  notes?: string;
+  createdAt?: any;
+}
+
 export type UserType = 'jobSeeker' | 'freelancer';
 
 export interface UserPreferences {

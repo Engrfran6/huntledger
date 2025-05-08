@@ -1,7 +1,5 @@
 'use client';
 
-import type React from 'react';
-
 import {Button} from '@/components/ui/button';
 import {
   Card,
@@ -21,64 +19,77 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
-import {useToast} from '@/components/ui/use-toast';
 import {addClient} from '@/lib/api';
+import {yupResolver} from '@hookform/resolvers/yup';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft} from 'lucide-react';
 import Link from 'next/link';
 import {useRouter} from 'next/navigation';
-import {useState} from 'react';
+import {useForm} from 'react-hook-form';
+import {toast} from 'sonner';
+import * as yup from 'yup';
+
+// Schema
+const clientSchema = yup.object().shape({
+  name: yup.string().required('Client name is required'),
+  company: yup.string().optional(),
+  project: yup.string().required('Project name is required'),
+  status: yup.string().required('Status is required'),
+  startDate: yup.string().required('Start date is required'),
+  endDate: yup.string().optional(),
+  budget: yup.string().optional(),
+  rate: yup.string().optional(),
+  contactEmail: yup.string().email('Invalid email').optional(),
+  contactPhone: yup.string().optional(),
+  notes: yup.string().optional(),
+});
+
+type ClientFormData = yup.InferType<typeof clientSchema>;
 
 export default function NewClientPage() {
   const router = useRouter();
-  const {toast} = useToast();
   const queryClient = useQueryClient();
 
-  const [formData, setFormData] = useState({
-    name: '',
-    company: '',
-    project: '',
-    status: 'active',
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: '',
-    budget: '',
-    rate: '',
-    contactEmail: '',
-    contactPhone: '',
-    notes: '',
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: {errors},
+  } = useForm<ClientFormData>({
+    resolver: yupResolver(clientSchema),
+    defaultValues: {
+      name: '',
+      company: '',
+      project: '',
+      status: 'active',
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: '',
+      budget: '',
+      rate: '',
+      contactEmail: '',
+      contactPhone: '',
+      notes: '',
+    },
   });
 
   const mutation = useMutation({
     mutationFn: addClient,
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['clients']});
-      toast({
-        title: 'Client added successfully',
+      toast.success('Client added successfully', {
         description: 'Your client has been added to your tracker.',
       });
       router.push('/dashboard/clients');
     },
     onError: (error: any) => {
-      toast({
-        title: 'Error adding client',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error('Error adding client', {description: error.message});
     },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const {name, value} = e.target;
-    setFormData((prev) => ({...prev, [name]: value}));
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({...prev, [name]: value}));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    mutation.mutate(formData);
+  const onSubmit = (data: ClientFormData) => {
+    mutation.mutate({
+      ...data,
+    });
   };
 
   return (
@@ -97,47 +108,31 @@ export default function NewClientPage() {
           <CardTitle>Add New Client</CardTitle>
           <CardDescription>Track a new client and their project details.</CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+
+        <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="name">Client Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
+                <Input id="name" {...register('name')} />
+                {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="company">Company (Optional)</Label>
-                <Input
-                  id="company"
-                  name="company"
-                  value={formData.company}
-                  onChange={handleChange}
-                />
+                <Label htmlFor="company">Company</Label>
+                <Input id="company" {...register('company')} />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="project">Project Name</Label>
-              <Input
-                id="project"
-                name="project"
-                value={formData.project}
-                onChange={handleChange}
-                required
-              />
+              <Input id="project" {...register('project')} />
+              {errors.project && <p className="text-red-500 text-sm">{errors.project.message}</p>}
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) => handleSelectChange('status', value)}>
+                <Label>Status</Label>
+                <Select defaultValue="active" onValueChange={(value) => setValue('status', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
@@ -148,62 +143,39 @@ export default function NewClientPage() {
                     <SelectItem value="cancelled">Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.status && <p className="text-red-500 text-sm">{errors.status.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="budget">Budget (Optional)</Label>
-                <Input
-                  id="budget"
-                  name="budget"
-                  value={formData.budget}
-                  onChange={handleChange}
-                  placeholder="$5,000"
-                />
+                <Label htmlFor="budget">Budget</Label>
+                <Input id="budget" {...register('budget')} placeholder="$5,000" />
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="startDate">Start Date</Label>
-                <Input
-                  id="startDate"
-                  name="startDate"
-                  type="date"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  required
-                />
+                <Input id="startDate" type="date" {...register('startDate')} />
+                {errors.startDate && (
+                  <p className="text-red-500 text-sm">{errors.startDate.message}</p>
+                )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="endDate">End Date (Optional)</Label>
-                <Input
-                  id="endDate"
-                  name="endDate"
-                  type="date"
-                  value={formData.endDate}
-                  onChange={handleChange}
-                />
+                <Label htmlFor="endDate">End Date</Label>
+                <Input id="endDate" type="date" {...register('endDate')} />
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="contactEmail">Contact Email (Optional)</Label>
-                <Input
-                  id="contactEmail"
-                  name="contactEmail"
-                  type="email"
-                  value={formData.contactEmail}
-                  onChange={handleChange}
-                />
+                <Label htmlFor="contactEmail">Contact Email</Label>
+                <Input id="contactEmail" type="email" {...register('contactEmail')} />
+                {errors.contactEmail && (
+                  <p className="text-red-500 text-sm">{errors.contactEmail.message}</p>
+                )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="contactPhone">Contact Phone (Optional)</Label>
-                <Input
-                  id="contactPhone"
-                  name="contactPhone"
-                  value={formData.contactPhone}
-                  onChange={handleChange}
-                />
+                <Label htmlFor="contactPhone">Contact Phone</Label>
+                <Input id="contactPhone" {...register('contactPhone')} />
               </div>
             </div>
 
@@ -211,14 +183,13 @@ export default function NewClientPage() {
               <Label htmlFor="notes">Notes</Label>
               <Textarea
                 id="notes"
-                name="notes"
-                value={formData.notes}
-                onChange={handleChange}
+                {...register('notes')}
                 placeholder="Add any notes about this client or project..."
                 className="min-h-[100px]"
               />
             </div>
           </CardContent>
+
           <CardFooter className="flex justify-between">
             <Button
               type="button"

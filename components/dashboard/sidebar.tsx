@@ -22,8 +22,10 @@ import {
   Calendar,
   FolderKanban,
   LayoutDashboard,
+  ListTodo,
   LogOut,
   Settings,
+  UserCog,
   Users,
 } from 'lucide-react';
 import {useTheme} from 'next-themes';
@@ -73,6 +75,16 @@ const freelancerNavItems = [
     icon: FolderKanban,
   },
   {
+    title: 'Tasks',
+    href: '/dashboard/tasks',
+    icon: ListTodo,
+  },
+  {
+    title: 'Subcontractors',
+    href: '/dashboard/subcontractors',
+    icon: UserCog,
+  },
+  {
     title: 'Analytics',
     href: '/dashboard/analytics',
     icon: BarChart3,
@@ -115,27 +127,33 @@ export function Sidebar() {
   const navItems = userType === 'jobSeeker' ? jobSeekerNavItems : freelancerNavItems;
 
   return (
-    <UISidebar>
+    <UISidebar variant="inset" collapsible="icon">
       <SidebarHeader>
-        <div className="flex h-14 items-center border-b  -ml-10 pb-1">
-          <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-            <Image
-              src={
-                theme === 'dark'
-                  ? '/logo-dark.png'
-                  : theme === 'light'
-                  ? '/logo-light.png'
-                  : '/logo-dark.png'
-              }
-              alt="HuntLedger Logo"
-              width={400}
-              height={32}
-            />
-          </Link>
+        <div className="flex h-20 items-center border-b  -ml-12 pb-1">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
+                  <Image
+                    src={
+                      theme === 'dark'
+                        ? '/logo-dark.png'
+                        : theme === 'light'
+                        ? '/logo-light.png'
+                        : '/logo-dark.png'
+                    }
+                    alt="HuntLedger Logo"
+                    width={400}
+                    height={32}
+                  />
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarMenu className="pl-6 pt-5">
+        <SidebarMenu className="px-3 pt-5">
           {navItems.map((item, index) => (
             <SidebarMenuItem key={index}>
               <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.title}>
@@ -145,7 +163,7 @@ export function Sidebar() {
                     if (isMobile) {
                       setOpenMobile(false);
                     } else {
-                      setOpen(false);
+                      setOpen(true);
                     }
                   }}>
                   <item.icon className="h-4 w-4" />

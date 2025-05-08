@@ -93,7 +93,7 @@ function JobSeekerStats({jobs}: {jobs: Job[]}) {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 grid-cols-2  lg:grid-cols-3">
       {stats.map((stat, i) => (
         <Card key={i}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -113,6 +113,7 @@ function JobSeekerStats({jobs}: {jobs: Job[]}) {
 }
 
 function FreelancerStats({clients}: {clients: Client[]}) {
+  if (!clients) return [];
   // Calculate statistics
   const totalClients = clients.length;
 
@@ -191,7 +192,7 @@ function FreelancerStats({clients}: {clients: Client[]}) {
   ];
 
   return (
-    <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 grid-cols-2  lg:grid-cols-3">
       {stats.map((stat, i) => (
         <Card key={i}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">

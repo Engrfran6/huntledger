@@ -72,7 +72,7 @@ export default function NewJobPage() {
       toast.success('Job added successfully', {
         description: 'Your job application has been added to your tracker.',
       });
-      router.push('/dashboard');
+      router.push('/dashboard/applications');
     },
     onError: (error: any) => {
       toast.error('Error adding job', {description: error.message});

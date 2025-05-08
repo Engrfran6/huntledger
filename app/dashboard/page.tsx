@@ -44,6 +44,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* <div className="sticky top-0 z-50 bg-gray-50 dark:bg-gray-900"> */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         {userType === 'jobSeeker' ? (
@@ -60,6 +61,7 @@ export default function DashboardPage() {
           </Button>
         )}
       </div>
+      {/* </div> */}
 
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-3">
@@ -73,7 +75,7 @@ export default function DashboardPage() {
         <StatsCards items={userType === 'jobSeeker' ? jobs || [] : clients || []} type={userType} />
       )}
 
-      <div className="rounded-lg border bg-card">
+      <div className="rounded-lg border bg-card/80">
         <div className="p-6">
           <h2 className="text-xl font-semibold">
             {userType === 'jobSeeker' ? 'Job Applications' : 'Client Projects'}
@@ -97,42 +99,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-//  <div className="space-y-6">
-//    <div className="flex items-center justify-between">
-//      <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-//      <Button
-//        onClick={() => router.push('/dashboard/jobs/new')}
-//        className="bg-orange-600 hover:bg-orange-700">
-//        <Plus className="mr-2 h-4 w-4" /> Add Job
-//      </Button>
-//    </div>
-
-//    {isLoading ? (
-//      <div className="grid gap-4 md:grid-cols-3">
-//        {Array(3)
-//          .fill(0)
-//          .map((_, i) => (
-//            <Skeleton key={i} className="h-32 w-full" />
-//          ))}
-//      </div>
-//    ) : (
-//      <StatsCards jobs={jobs || []} />
-//    )}
-
-//    <div className="rounded-lg border bg-card">
-//      <div className="p-6">
-//        <h2 className="text-xl font-semibold">Job Applications</h2>
-//        <p className="text-sm  text-orange-600">
-//          Manage and track all your remote job applications.
-//        </p>
-//      </div>
-//      {isLoading ? (
-//        <div className="p-6">
-//          <Skeleton className="h-64 w-full" />
-//        </div>
-//      ) : (
-//        <JobsTable jobs={jobs || []} />
-//      )}
-//    </div>
-//  </div>;

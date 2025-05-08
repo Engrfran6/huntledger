@@ -1,15 +1,15 @@
 'use client';
 
 import {Button} from '@/components/ui/button';
-import {useToast} from '@/components/ui/use-toast';
+
 import {updateUserPreferences} from '@/lib/api';
 import {useUserStore} from '@/lib/stores/user-store';
 import {BriefcaseBusiness, Users} from 'lucide-react';
 import {useEffect} from 'react';
+import {toast} from 'sonner';
 
 export function UserTypeSwitcher() {
   const {userType, setUserType, preferences, updatePreferences} = useUserStore();
-  const {toast} = useToast();
 
   // Update local storage and Firebase when user type changes
   const handleUserTypeChange = async (type: 'jobSeeker' | 'freelancer') => {
@@ -20,11 +20,10 @@ export function UserTypeSwitcher() {
       await updateUserPreferences({userType: type});
     } catch (error) {
       // If Firebase update fails, just continue with local storage update
-      console.error('Failed to update user preferences in Firebase', error);
+      console.error('Failed to update user preferences', error);
     }
 
-    toast({
-      title: `Switched to ${type === 'jobSeeker' ? 'Job Seeker' : 'Freelancer'} mode`,
+    toast(`Switched to ${type === 'jobSeeker' ? 'Job Seeker' : 'Freelancer'} mode`, {
       description: `You are now tracking ${
         type === 'jobSeeker' ? 'job applications' : 'client projects'
       }.`,
