@@ -78,7 +78,7 @@ export default function DashboardPage() {
           <h2 className="text-xl font-semibold">
             {userType === 'jobSeeker' ? 'Job Applications' : 'Client Projects'}
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-orange-600">
             {userType === 'jobSeeker'
               ? 'Manage and track all your remote job applications.'
               : 'Manage and track all your client projects.'}
