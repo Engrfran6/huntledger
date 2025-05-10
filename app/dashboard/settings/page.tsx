@@ -22,19 +22,38 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Switch} from '@/components/ui/switch';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {useToast} from '@/components/ui/use-toast';
 import {useAuthState} from '@/lib/auth-hooks';
-import {deleteUser, updateEmail, updatePassword} from 'firebase/auth';
+import {
+  deleteUser,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updateEmail,
+  updatePassword,
+} from 'firebase/auth';
 import {useState} from 'react';
-import {toast} from 'sonner';
 
 export default function SettingsPage() {
   const {user} = useAuthState();
-
+  const {toast} = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [reauthLoading, setReauthLoading] = useState(false);
+  const [reauthDialogOpen, setReauthDialogOpen] = useState(false);
+  const [reauthPassword, setReauthPassword] = useState('');
+  const [reauthError, setReauthError] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<'email' | 'password' | null>(null);
 
   const [email, setEmail] = useState(user?.email || '');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -45,45 +64,107 @@ export default function SettingsPage() {
   const [weeklyDigest, setWeeklyDigest] = useState(true);
   const [applicationReminders, setApplicationReminders] = useState(true);
 
-  const handleUpdateEmail = async (e: React.FormEvent) => {
+  const handleReauthenticate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setReauthError(null);
+    setReauthLoading(true);
+
+    try {
+      if (!user || !user.email) {
+        throw new Error('User not found');
+      }
+
+      const credential = EmailAuthProvider.credential(user.email, reauthPassword);
+      await reauthenticateWithCredential(user, credential);
+
+      setReauthDialogOpen(false);
+      setReauthPassword('');
+
+      // Continue with the pending action
+      if (pendingAction === 'email') {
+        await handleUpdateEmail(null, true);
+      } else if (pendingAction === 'password') {
+        await handleUpdatePassword(null, true);
+      }
+    } catch (error: any) {
+      setReauthError(error.message);
+      toast({
+        title: 'Authentication failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setReauthLoading(false);
+    }
+  };
+
+  const handleUpdateEmail = async (e: React.FormEvent | null, isReauthenticated = false) => {
+    if (e) e.preventDefault();
     if (!user) return;
+
+    if (!isReauthenticated) {
+      setPendingAction('email');
+      setReauthDialogOpen(true);
+      return;
+    }
 
     setIsLoading(true);
     try {
       await updateEmail(user, email);
-      toast.success('Email updated', {description: 'Your email has been updated successfully.'});
+      toast({
+        title: 'Email updated',
+        description: 'Your email has been updated successfully.',
+      });
     } catch (error: any) {
-      toast.error('Error updating email', {description: error.message});
+      toast({
+        title: 'Error updating email',
+        description: error.message,
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
+      setPendingAction(null);
     }
   };
 
-  const handleUpdatePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleUpdatePassword = async (e: React.FormEvent | null, isReauthenticated = false) => {
+    if (e) e.preventDefault();
     if (!user) return;
 
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords don't match", {
+      toast({
+        title: "Passwords don't match",
         description: 'New password and confirm password must match.',
+        variant: 'destructive',
       });
+      return;
+    }
+
+    if (!isReauthenticated) {
+      setPendingAction('password');
+      setReauthDialogOpen(true);
       return;
     }
 
     setIsLoading(true);
     try {
       await updatePassword(user, newPassword);
-      toast.success('Password updated', {
+      toast({
+        title: 'Password updated',
         description: 'Your password has been updated successfully.',
       });
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: any) {
-      toast.error('Error updating password', {description: error.message});
+      toast({
+        title: 'Error updating password',
+        description: error.message,
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
+      setPendingAction(null);
     }
   };
 
@@ -93,11 +174,16 @@ export default function SettingsPage() {
     setIsLoading(true);
     try {
       await deleteUser(user);
-      toast.success('Account deleted', {
+      toast({
+        title: 'Account deleted',
         description: 'Your account has been deleted successfully.',
       });
     } catch (error: any) {
-      toast.error('Error deleting account', {description: error.message});
+      toast({
+        title: 'Error deleting account',
+        description: error.message,
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +191,7 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
       </div>
 
@@ -122,7 +208,7 @@ export default function SettingsPage() {
               <CardTitle>Email</CardTitle>
               <CardDescription>Update your email address</CardDescription>
             </CardHeader>
-            <form onSubmit={handleUpdateEmail}>
+            <form onSubmit={(e) => handleUpdateEmail(e)}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -148,18 +234,8 @@ export default function SettingsPage() {
               <CardTitle>Password</CardTitle>
               <CardDescription>Update your password</CardDescription>
             </CardHeader>
-            <form onSubmit={handleUpdatePassword}>
+            <form onSubmit={(e) => handleUpdatePassword(e)}>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="current-password">Current Password</Label>
-                  <Input
-                    id="current-password"
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    required
-                  />
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="new-password">New Password</Label>
                   <Input
@@ -307,6 +383,41 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Reauthentication Dialog */}
+      <Dialog open={reauthDialogOpen} onOpenChange={setReauthDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Your Identity</DialogTitle>
+            <DialogDescription>
+              For security reasons, please enter your current password to continue.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleReauthenticate}>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="current-password">Current Password</Label>
+                <Input
+                  id="current-password"
+                  type="password"
+                  value={reauthPassword}
+                  onChange={(e) => setReauthPassword(e.target.value)}
+                  required
+                />
+                {reauthError && <p className="text-sm text-red-500">{reauthError}</p>}
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setReauthDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={reauthLoading}>
+                {reauthLoading ? 'Verifying...' : 'Confirm'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

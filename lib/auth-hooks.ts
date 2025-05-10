@@ -3,7 +3,9 @@
 import {auth} from '@/lib/firebase';
 import {
   createUserWithEmailAndPassword,
+  EmailAuthProvider,
   onAuthStateChanged,
+  reauthenticateWithCredential,
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
@@ -63,7 +65,18 @@ export function useSignIn() {
     }
   };
 
-  return {signIn, error, loading};
+  const reauthenticate = async (email: string, password: string) => {
+    try {
+      const credential = EmailAuthProvider.credential(email, password);
+      await reauthenticateWithCredential(auth.currentUser!, credential);
+      return true;
+    } catch (error: any) {
+      setError(error.message);
+      return false;
+    }
+  };
+
+  return {signIn, reauthenticate, error, loading};
 }
 
 export function useSignUp() {
