@@ -206,7 +206,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
+      <div className="mb-6 ">
         <Link
           href="/dashboard/tasks"
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">

@@ -70,7 +70,7 @@ export default function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between ">
         <h1 className="text-2xl font-bold tracking-tight">Projects</h1>
         <Button
           onClick={() => router.push('/dashboard/clients/new')}

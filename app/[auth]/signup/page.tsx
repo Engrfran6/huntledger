@@ -5,7 +5,6 @@ import {useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
 import Link from 'next/link';
-import {useRouter} from 'next/navigation';
 
 import {Button} from '@/components/ui/button';
 import {
@@ -19,8 +18,8 @@ import {
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 
-import {auth} from '@/lib/firebase';
-import {createUserWithEmailAndPassword} from 'firebase/auth';
+import {useSignUp} from '@/lib/auth-hooks';
+import {useUserStore} from '@/lib/stores/user-store';
 import {Eye, EyeOff} from 'lucide-react';
 import {useState} from 'react';
 import {toast} from 'sonner';
@@ -37,7 +36,8 @@ type FormData = yup.InferType<typeof schema>;
 
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
+  const {signUp, loading: isLoading, error} = useSignUp();
+  const {resetPreferences} = useUserStore();
 
   const {
     register,
@@ -49,13 +49,16 @@ export default function SignUpPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await createUserWithEmailAndPassword(auth, data.email, data.password);
-      toast.success('Account created successfully!', {
-        description: 'You can now sign in with your credentials.',
-      });
-      router.push('/dashboard');
-    } catch (error: any) {
-      toast.error('Error creating account', {description: error.message});
+      resetPreferences();
+      const success = await signUp(data.email, data.password);
+
+      if (success) {
+        toast.success('Account created successfully!', {
+          description: 'You can now sign in with your credentials.',
+        });
+      }
+    } catch (err) {
+      console.log(error);
     }
   };
 
@@ -104,12 +107,12 @@ export default function SignUpPage() {
             <Button
               type="submit"
               className="w-full bg-orange-600 hover:bg-orange-700"
-              disabled={isSubmitting}>
-              {isSubmitting ? 'Creating account...' : 'Create account'}
+              disabled={isLoading}>
+              {isLoading ? 'Creating account...' : 'Create account'}
             </Button>
             <div className="text-center text-sm">
               Already have an account?{' '}
-              <Link href="/auth/signin" className="text-orange-600 hover:underline">
+              <Link href="/signin" className="text-orange-600 hover:underline">
                 Sign in
               </Link>
             </div>

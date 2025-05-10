@@ -50,6 +50,8 @@ type Job = {
   salary?: string;
   appliedDate: string;
   notes?: string;
+  interviewDate: string;
+  startDate: string;
 };
 
 const schema = yup.object().shape({
@@ -61,6 +63,8 @@ const schema = yup.object().shape({
   salary: yup.string().optional(),
   appliedDate: yup.string().required('Date applied is required'),
   notes: yup.string().optional(),
+  interviewDate: yup.string().required('Interview date is required'),
+  startDate: yup.string().required('Offer start date is required'),
 });
 
 export default function EditJobPage({params}: {params: {id: string}}) {
@@ -71,6 +75,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
     control,
     handleSubmit,
     setValue,
+    watch,
     formState: {errors},
   } = useForm<Job>({
     resolver: yupResolver(schema),
@@ -83,8 +88,12 @@ export default function EditJobPage({params}: {params: {id: string}}) {
       salary: '',
       appliedDate: '',
       notes: '',
+      interviewDate: '',
+      startDate: '',
     },
   });
+
+  const status = watch('status');
 
   const {data: job, isLoading} = useQuery({
     queryKey: ['job', params.id],
@@ -133,6 +142,22 @@ export default function EditJobPage({params}: {params: {id: string}}) {
   });
 
   const onSubmit = (data: Job) => {
+    if (!data) return;
+
+    // Validate conditional fields
+    if (data.status === 'interview' && !data.interviewDate) {
+      toast.error('Interview date required', {
+        description: 'Please enter an interview date for jobs with interview status.',
+      });
+      return;
+    }
+
+    if (data.status === 'offer' && !data.startDate) {
+      toast.error('Start date required', {
+        description: 'Please enter a start date for jobs with offer status.',
+      });
+      return;
+    }
     updateMutation.mutate({id: params.id, ...data});
   };
 
@@ -161,7 +186,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
+      <div className="mb-6 ">
         <Link
           href="/dashboard"
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
@@ -298,6 +323,44 @@ export default function EditJobPage({params}: {params: {id: string}}) {
                 <p className="text-sm text-red-500">{errors.appliedDate.message}</p>
               )}
             </div>
+
+            {status === 'interview' && (
+              <div className="space-y-2">
+                <Label htmlFor="interviewDate">
+                  Interview Date <span className="text-red-500">*</span>
+                </Label>
+                <Controller
+                  name="interviewDate"
+                  control={control}
+                  render={({field}) => <Input {...field} id="interviewDate" type="date" />}
+                />
+                {errors.appliedDate && (
+                  <p className="text-sm text-red-500">{errors.appliedDate.message}</p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  You'll receive a reminder 24 hours before the interview.
+                </p>
+              </div>
+            )}
+
+            {status === 'offer' && (
+              <div className="space-y-2">
+                <Label htmlFor="startDate">
+                  Start Date <span className="text-red-500">*</span>
+                </Label>
+                <Controller
+                  name="startDate"
+                  control={control}
+                  render={({field}) => <Input {...field} id="startDate" type="date" />}
+                />
+                {errors.appliedDate && (
+                  <p className="text-sm text-red-500">{errors.appliedDate.message}</p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  You'll receive a reminder 24 hours before your start date.
+                </p>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="notes">Notes</Label>

@@ -94,7 +94,7 @@ export default function NewClientPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
+      <div className="mb-6 ">
         <Link
           href="/dashboard/clients"
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">

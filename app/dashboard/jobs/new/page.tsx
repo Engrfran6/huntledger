@@ -38,6 +38,8 @@ const jobSchema = yup.object().shape({
   salary: yup.string().optional(),
   notes: yup.string().optional(),
   appliedDate: yup.string().required('Date applied is required'),
+  interviewDate: yup.string().required('Interview date is required'),
+  startDate: yup.string().required('Offer start date is required'),
 });
 
 type JobFormData = yup.InferType<typeof jobSchema>;
@@ -50,6 +52,7 @@ export default function NewJobPage() {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: {errors},
   } = useForm<JobFormData>({
     resolver: yupResolver(jobSchema),
@@ -62,8 +65,12 @@ export default function NewJobPage() {
       salary: '',
       notes: '',
       appliedDate: new Date().toISOString().split('T')[0],
+      interviewDate: '',
+      startDate: '',
     },
   });
+
+  const status = watch('status');
 
   const mutation = useMutation({
     mutationFn: addJob,
@@ -80,6 +87,20 @@ export default function NewJobPage() {
   });
 
   const onSubmit = (data: JobFormData) => {
+    if (data.status === 'interview' && !data.interviewDate) {
+      toast.error('Interview date required', {
+        description: 'Please enter an interview date for jobs with interview status.',
+      });
+      return;
+    }
+
+    if (data.status === 'offer' && !data.startDate) {
+      toast.error('Start date required', {
+        description: 'Please enter a start date for jobs with offer status.',
+      });
+      return;
+    }
+
     mutation.mutate({
       ...data,
       location: data.location || '',
@@ -91,7 +112,7 @@ export default function NewJobPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
+      <div className="mb-6 ">
         <Link
           href="/dashboard"
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
@@ -145,6 +166,35 @@ export default function NewJobPage() {
                 {errors.status && <p className="text-red-500 text-sm">{errors.status.message}</p>}
               </div>
             </div>
+
+            {status === 'interview' && (
+              <div className="space-y-2">
+                <Label htmlFor="interviewDate">
+                  Interview Date <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="interviewDate"
+                  type="datetime-local"
+                  {...register('interviewDate')}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  You'll receive a reminder 24 hours before the interview.
+                </p>
+              </div>
+            )}
+
+            {status === 'offer' && (
+              <div className="space-y-2">
+                <Label htmlFor="startDate">
+                  Start Date <span className="text-red-500">*</span>
+                </Label>
+                <Input id="startDate" type="date" {...register('startDate')} required />
+                <p className="text-xs text-muted-foreground">
+                  You'll receive a reminder 24 hours before your start date.
+                </p>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">

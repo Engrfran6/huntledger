@@ -13,9 +13,9 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import {useIsMobile} from '@/hooks/use-mobile';
-import {auth} from '@/lib/firebase';
+import {useSignOut} from '@/lib/auth-hooks';
 import {useUserStore} from '@/lib/stores/user-store';
-import {signOut} from 'firebase/auth';
+import {cn} from '@/lib/utils';
 import {
   BarChart3,
   BriefcaseBusiness,
@@ -106,15 +106,12 @@ const commonNavItems = [
 ];
 
 export function Sidebar() {
-  const {setOpen, setOpenMobile} = useSidebar();
+  const {open, setOpenMobile} = useSidebar();
+  const {logout, loading: isSigningOut} = useSignOut();
   const isMobile = useIsMobile();
 
   const {userType} = useUserStore();
   const pathname = usePathname();
-
-  const handleSignOut = async () => {
-    await signOut(auth);
-  };
 
   const {theme} = useTheme();
 
@@ -129,43 +126,39 @@ export function Sidebar() {
   return (
     <UISidebar variant="inset" collapsible="icon">
       <SidebarHeader>
-        <div className="flex h-20 items-center border-b  -ml-12 pb-1">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-                  <Image
-                    src={
-                      theme === 'dark'
-                        ? '/logo-dark.png'
-                        : theme === 'light'
-                        ? '/logo-light.png'
-                        : '/logo-dark.png'
-                    }
-                    alt="HuntLedger Logo"
-                    width={400}
-                    height={32}
-                  />
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </div>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <Link
+              href="/dashboard"
+              className={cn(
+                'flex items-center gap-2 font-bold -ml-6 border-b -mt-2 pb-1.5',
+                !open && 'ml-0'
+              )}>
+              <Image src={'/logo.ico'} alt="HuntLedger Logo" width={100} height={50} />
+              <span className={cn('flex flex-col -ml-9 leading-[10px]', !open && 'hidden')}>
+                <span className="text-lg">
+                  <span className={cn('text-white', theme === 'light' && 'text-gray-900')}>
+                    Hunt
+                  </span>
+                  <span className="text-orange-600">Le</span>
+                  <span className={cn('text-white', theme === 'light' && 'text-gray-900')}>
+                    dger
+                  </span>
+                </span>
+                <span className="text-[9px] text-orange-600">
+                  Organize your job hunt, land faster
+                </span>
+              </span>
+            </Link>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu className="px-3 pt-5">
           {navItems.map((item, index) => (
             <SidebarMenuItem key={index}>
               <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.title}>
-                <Link
-                  href={item.href}
-                  onClick={() => {
-                    if (isMobile) {
-                      setOpenMobile(false);
-                    } else {
-                      setOpen(true);
-                    }
-                  }}>
+                <Link href={item.href}>
                   <item.icon className="h-4 w-4" />
                   <span>{item.title}</span>
                 </Link>
@@ -186,9 +179,13 @@ export function Sidebar() {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
-        <Button variant="outline" className="w-full justify-start" onClick={handleSignOut}>
+        <Button
+          variant="outline"
+          className="w-full justify-start"
+          onClick={logout}
+          disabled={isSigningOut}>
           <LogOut className="mr-2 h-4 w-4" />
-          Sign out
+          {isSigningOut ? 'Signing out...' : 'Sign out'}
         </Button>
       </SidebarFooter>
     </UISidebar>

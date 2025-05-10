@@ -11,25 +11,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {SidebarTrigger} from '@/components/ui/sidebar';
-import {useAuthState} from '@/lib/auth-hooks';
-import {auth} from '@/lib/firebase';
-import {signOut} from 'firebase/auth';
+import {useAuthState, useSignOut} from '@/lib/auth-hooks';
 import {Bell, LogOut, User} from 'lucide-react';
+import {SidebarTrigger} from '../ui/sidebar';
 import {UserTypeSwitcher} from '../user-type-switcher';
 
 export function Header() {
   const {user} = useAuthState();
-
-  const handleSignOut = async () => {
-    await signOut(auth);
-  };
+  const {logout, loading: isSigningOut} = useSignOut();
 
   const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U';
 
   return (
-    <header className="sticky top-0 z-10 flex h-24 items-center gap-4 border-b bg-background px-4 sm:px-6">
-      <SidebarTrigger />
+    <header className="sticky top-0 z-10 flex h-20 md:h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
+      <SidebarTrigger className="-ml-1.5" />
 
       <div className="block">
         <UserTypeSwitcher />
@@ -59,9 +54,10 @@ export function Header() {
               <User className=" h-4 w-4" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleSignOut}>
+
+            <DropdownMenuItem onClick={logout} disabled={isSigningOut}>
               <LogOut className=" h-4 w-4" />
-              Log out
+              {isSigningOut ? 'Signing out...' : 'Sign out'}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

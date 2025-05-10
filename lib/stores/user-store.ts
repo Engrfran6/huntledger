@@ -7,6 +7,7 @@ interface UserState {
   setUserType: (type: UserType) => void;
   preferences: UserPreferences;
   updatePreferences: (prefs: Partial<UserPreferences>) => void;
+  resetPreferences: () => void;
 }
 
 export const useUserStore = create<UserState>()(
@@ -18,6 +19,7 @@ export const useUserStore = create<UserState>()(
         userType: 'jobSeeker',
         theme: 'system',
         emailNotifications: true,
+        rememberUserType: false,
       },
       updatePreferences: (prefs) =>
         set((state) => ({
@@ -25,7 +27,19 @@ export const useUserStore = create<UserState>()(
             ...state.preferences,
             ...prefs,
           },
+          // Also update userType if it's included in the preferences update
+          ...(prefs.userType ? {userType: prefs.userType} : {}),
         })),
+      resetPreferences: () =>
+        set({
+          userType: 'jobSeeker',
+          preferences: {
+            userType: 'jobSeeker',
+            theme: 'system',
+            emailNotifications: true,
+            rememberUserType: false,
+          },
+        }),
     }),
     {
       name: 'user-preferences',

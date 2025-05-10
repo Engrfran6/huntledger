@@ -1,60 +1,82 @@
 'use client';
 
 import {Button} from '@/components/ui/button';
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {updateUserPreferences} from '@/lib/api';
 import {useUserStore} from '@/lib/stores/user-store';
-import {BriefcaseBusiness, Users} from 'lucide-react';
-import {useEffect} from 'react';
-import {toast} from 'sonner';
+import {Briefcase, FileSearch, Loader2} from 'lucide-react';
+import {useRouter} from 'next/navigation';
+import {useState} from 'react';
 
 export function UserTypeSwitcher() {
   const {userType, setUserType, preferences, updatePreferences} = useUserStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  // Update local storage and Firebase when user type changes
   const handleUserTypeChange = async (type: 'jobSeeker' | 'freelancer') => {
-    setUserType(type);
-    updatePreferences({userType: type});
+    if (type === userType) return;
 
+    setIsLoading(true);
     try {
-      await updateUserPreferences({userType: type});
-    } catch (error) {
-      // If Firebase update fails, just continue with local storage update
-      console.error('Failed to update user preferences', error);
-    }
+      // Update local state
+      setUserType(type);
 
-    toast(`Switched to ${type === 'jobSeeker' ? 'Job Seeker' : 'Freelancer'} mode`, {
-      description: `You are now tracking ${
-        type === 'jobSeeker' ? 'job applications' : 'client projects'
-      }.`,
-    });
+      // Update preferences
+      updatePreferences({
+        userType: type,
+      });
+
+      // Update in database if remember preference is enabled
+      if (preferences.rememberUserType) {
+        await updateUserPreferences({
+          userType: type,
+        });
+      }
+
+      // Redirect to dashboard to ensure proper context
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Error changing user type:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Sync user type with preferences on mount
-  useEffect(() => {
-    if (preferences.userType !== userType) {
-      setUserType(preferences.userType);
-    }
-  }, [preferences.userType, userType, setUserType]);
-
   return (
-    <div className="flex items-center space-x-2">
-      <Button
-        variant={userType === 'jobSeeker' ? 'default' : 'outline'}
-        size="sm"
-        className={userType === 'jobSeeker' ? 'bg-orange-600 hover:bg-orange-700' : ''}
-        onClick={() => handleUserTypeChange('jobSeeker')}>
-        <BriefcaseBusiness className="mr-2 h-4 w-4" />
-        Job Seeker
-      </Button>
-      <Button
-        variant={userType === 'freelancer' ? 'default' : 'outline'}
-        size="sm"
-        className={userType === 'freelancer' ? 'bg-orange-600 hover:bg-orange-700' : ''}
-        onClick={() => handleUserTypeChange('freelancer')}>
-        <Users className="mr-2 h-4 w-4" />
-        Freelancer
-      </Button>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="h-8 gap-1">
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : userType === 'jobSeeker' ? (
+            <FileSearch className="h-4 w-4" />
+          ) : (
+            <Briefcase className="h-4 w-4" />
+          )}
+          {userType === 'jobSeeker' ? 'Job Seeker' : 'Freelancer'}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem
+          className="gap-2"
+          onClick={() => handleUserTypeChange('jobSeeker')}
+          disabled={userType === 'jobSeeker' || isLoading}>
+          <FileSearch className="h-4 w-4" />
+          <span>Switch to Job Seeker</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="gap-2"
+          onClick={() => handleUserTypeChange('freelancer')}
+          disabled={userType === 'freelancer' || isLoading}>
+          <Briefcase className="h-4 w-4" />
+          <span>Switch to Freelancer</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

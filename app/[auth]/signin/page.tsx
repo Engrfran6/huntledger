@@ -16,11 +16,10 @@ import {
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import Link from 'next/link';
-import {useRouter} from 'next/navigation';
 import {useState} from 'react';
 
-import {auth} from '@/lib/firebase';
-import {signInWithEmailAndPassword} from 'firebase/auth';
+import {useSignIn} from '@/lib/auth-hooks';
+import {Firestore, doc as firestoreDoc} from 'firebase/firestore';
 import {Eye, EyeOff, Loader2} from 'lucide-react';
 import {toast} from 'sonner';
 
@@ -34,10 +33,12 @@ const schema = yup.object().shape({
 
 type FormData = yup.InferType<typeof schema>;
 
+function doc(db: Firestore, collection: string, uid: string) {
+  return firestoreDoc(db, collection, uid);
+}
+
 export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
-  const [firebaseLoading, setFirebaseLoading] = useState(false);
 
   const {
     register,
@@ -47,19 +48,13 @@ export default function SignInPage() {
     resolver: yupResolver(schema),
   });
 
+  const {signIn, error, loading} = useSignIn();
+
   const onSubmit = async (data: FormData) => {
-    setFirebaseLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      toast.success('Signed in successfully!', {
-        description: 'Welcome back to RemoteHunt.',
-      });
-      router.push('/dashboard');
-    } catch (error: any) {
-      toast.error('Error signing in', {description: error.message});
-    } finally {
-      setFirebaseLoading(false);
-    }
+    const success = await signIn(data.email, data.password);
+
+    if (success)
+      return toast('Signed in successfully!', {description: 'Welcome back to HuntLedger.'});
   };
 
   return (
@@ -80,7 +75,7 @@ export default function SignInPage() {
                 type="email"
                 placeholder="name@example.com"
                 {...register('email')}
-                disabled={firebaseLoading || isSubmitting}
+                disabled={loading || isSubmitting}
               />
               {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
             </div>
@@ -91,7 +86,7 @@ export default function SignInPage() {
                 type={showPassword ? 'text' : 'password'}
                 {...register('password')}
                 className="pr-10"
-                disabled={firebaseLoading || isSubmitting}
+                disabled={loading || isSubmitting}
               />
               {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
 
@@ -107,8 +102,8 @@ export default function SignInPage() {
             <Button
               type="submit"
               className="w-full bg-orange-600 hover:bg-orange-700"
-              disabled={firebaseLoading || isSubmitting}>
-              {firebaseLoading || isSubmitting ? (
+              disabled={loading || isSubmitting}>
+              {loading || isSubmitting ? (
                 <>
                   <Loader2 className="animate-spin size-5 mr-2" />
                   Signing in...

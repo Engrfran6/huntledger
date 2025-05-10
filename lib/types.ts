@@ -9,6 +9,8 @@ export interface Job {
   salary?: string;
   notes?: string;
   appliedDate: string;
+  interviewDate?: string;
+  startDate?: string;
   createdAt?: any;
 }
 
@@ -66,4 +68,5 @@ export interface UserPreferences {
   userType: UserType;
   theme?: string;
   emailNotifications?: boolean;
+  rememberUserType?: boolean;
 }
