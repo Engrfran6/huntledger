@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 
+import {FieldLabel} from '@/components/dashboard/shared/custom-label';
 import {useSignUp} from '@/lib/auth-hooks';
 import {useUserStore} from '@/lib/stores/user-store';
 import {Eye, EyeOff} from 'lucide-react';
