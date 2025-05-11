@@ -1,4 +1,4 @@
-import {updateUserPreferences} from '@/lib/api';
+import {updateNotificationPreferences, updateUserPreferences} from '@/lib/api';
 import type {NotificationPreferences, UserPreferences, UserType} from '@/lib/types';
 import {create} from 'zustand';
 import {persist} from 'zustand/middleware';
@@ -65,8 +65,8 @@ export const useUserStore = create<UserState>()(
             },
           }));
 
-          // Save to Firebase database
-          await updateUserPreferences({notifications});
+          // Save to Firebase database using the specific function
+          await updateNotificationPreferences(notifications);
 
           return true;
         } catch (error) {

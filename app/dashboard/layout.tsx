@@ -5,8 +5,12 @@ import type React from 'react';
 import {Header} from '@/components/dashboard/header';
 import {Sidebar} from '@/components/dashboard/sidebar';
 import {SidebarInset, SidebarProvider} from '@/components/ui/sidebar';
+import {fetchClients, fetchJobs} from '@/lib/api';
 import {useAuthState} from '@/lib/auth-hooks';
+import {useClientsStore} from '@/lib/stores/client-store';
+import {useJobsStore} from '@/lib/stores/jobs-store';
 import {useUserStore} from '@/lib/stores/user-store';
+import {useQuery} from '@tanstack/react-query';
 import {Loader2} from 'lucide-react';
 import {usePathname, useRouter} from 'next/navigation';
 import {useEffect, useState} from 'react';
@@ -19,31 +23,31 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
   const {userType} = useUserStore();
 
   // Define routes specific to each user type
-  // const freelancerRoutes = [
-  //   '/dashboard/clients',
-  //   '/dashboard/clients/new',
-  //   '/dashboard/projects',
-  //   '/dashboard/tasks',
-  //   '/dashboard/tasks/new',
-  //   '/dashboard/subcontractors',
-  //   '/dashboard/subcontractors/new',
-  // ];
+  const freelancerRoutes = [
+    '/dashboard/clients',
+    '/dashboard/clients/new',
+    '/dashboard/projects',
+    '/dashboard/tasks',
+    '/dashboard/tasks/new',
+    '/dashboard/subcontractors',
+    '/dashboard/subcontractors/new',
+  ];
 
-  // const jobSeekerRoutes = ['/dashboard/applications', '/dashboard/jobs/new'];
+  const jobSeekerRoutes = ['/dashboard/applications', '/dashboard/jobs/new'];
 
-  // // Check if current route is specific to a user type
-  // const isFreelancerRoute = freelancerRoutes.some(
-  //   (route) =>
-  //     pathname.startsWith(route) ||
-  //     (pathname.includes('/clients/') && !pathname.endsWith('/new')) ||
-  //     (pathname.includes('/tasks/') && !pathname.endsWith('/new')) ||
-  //     (pathname.includes('/subcontractors/') && !pathname.endsWith('/new'))
-  // );
+  // Check if current route is specific to a user type
+  const isFreelancerRoute = freelancerRoutes.some(
+    (route) =>
+      pathname.startsWith(route) ||
+      (pathname.includes('/clients/') && !pathname.endsWith('/new')) ||
+      (pathname.includes('/tasks/') && !pathname.endsWith('/new')) ||
+      (pathname.includes('/subcontractors/') && !pathname.endsWith('/new'))
+  );
 
-  // const isJobSeekerRoute = jobSeekerRoutes.some(
-  //   (route) =>
-  //     pathname.startsWith(route) || (pathname.includes('/jobs/') && !pathname.endsWith('/new'))
-  // );
+  const isJobSeekerRoute = jobSeekerRoutes.some(
+    (route) =>
+      pathname.startsWith(route) || (pathname.includes('/jobs/') && !pathname.endsWith('/new'))
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -55,18 +59,40 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
     }
   }, [user, loading, mounted, router]);
 
-  // // Redirect if user is on a page not valid for their user type
-  // useEffect(() => {
-  //   if (mounted && !loading && user) {
-  //     if (userType === 'jobSeeker' && isFreelancerRoute) {
-  //       router.push('/dashboard');
-  //     } else if (userType === 'freelancer' && isJobSeekerRoute) {
-  //       router.push('/dashboard');
-  //     }
-  //   }
-  // }, [userType, pathname, mounted, loading, user, router, isFreelancerRoute, isJobSeekerRoute]);
+  // Redirect if user is on a page not valid for their user type
+  useEffect(() => {
+    if (mounted && !loading && user) {
+      if (userType === 'jobSeeker' && isFreelancerRoute) {
+        router.push('/dashboard');
+      } else if (userType === 'freelancer' && isJobSeekerRoute) {
+        router.push('/dashboard');
+      }
+    }
+  }, [userType, pathname, mounted, loading, user, router, isFreelancerRoute, isJobSeekerRoute]);
 
-  if (loading || !mounted) {
+  const {setJobs} = useJobsStore();
+  const {setClients} = useClientsStore();
+
+  const {data: jobs, isLoading: isLoadingJobs} = useQuery({
+    queryKey: ['jobs'],
+    queryFn: fetchJobs,
+  });
+
+  const {data: clients, isLoading: isLoadingClients} = useQuery({
+    queryKey: ['clients'],
+    queryFn: fetchClients,
+  });
+
+  useEffect(() => {
+    if (jobs) {
+      setJobs(jobs);
+    }
+    if (clients) {
+      setClients(clients);
+    }
+  }, []);
+
+  if (loading || !mounted || isLoadingJobs || isLoadingClients) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-orange-600" />

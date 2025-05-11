@@ -1,5 +1,6 @@
 'use client';
 
+import {FieldLabel} from '@/components/dashboard/shared/custom-label';
 import {Button} from '@/components/ui/button';
 import {
   Card,
@@ -31,11 +32,11 @@ import * as yup from 'yup';
 // Schema
 const clientSchema = yup.object().shape({
   name: yup.string().required('Client name is required'),
-  company: yup.string().optional(),
+  company: yup.string().required(),
   project: yup.string().required('Project name is required'),
   status: yup.string().required('Status is required'),
   startDate: yup.string().required('Start date is required'),
-  endDate: yup.string().optional(),
+  endDate: yup.string().required(),
   budget: yup.string().optional(),
   rate: yup.string().optional(),
   contactEmail: yup.string().email('Invalid email').optional(),
@@ -60,7 +61,7 @@ export default function NewClientPage() {
       name: '',
       company: '',
       project: '',
-      status: 'active',
+      status: '',
       startDate: new Date().toISOString().split('T')[0],
       endDate: '',
       budget: '',
@@ -112,33 +113,43 @@ export default function NewClientPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <FieldLabel htmlFor="name">Client Name</FieldLabel>
+                <FieldLabel htmlFor="name" required>
+                  Client Name
+                </FieldLabel>
                 <Input id="name" {...register('name')} />
                 {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
               </div>
               <div className="space-y-2">
-                <FieldLabel htmlFor="company">Company</FieldLabel>
+                <FieldLabel htmlFor="company" required>
+                  Company
+                </FieldLabel>
                 <Input id="company" {...register('company')} />
               </div>
             </div>
 
             <div className="space-y-2">
-              <FieldLabel htmlFor="project">Project Name</FieldLabel>
+              <FieldLabel htmlFor="project" required>
+                Project Name
+              </FieldLabel>
               <Input id="project" {...register('project')} />
               {errors.project && <p className="text-red-500 text-sm">{errors.project.message}</p>}
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <FieldLabel>Status</FieldLabel>
-                <Select defaultValue="active" onValueChange={(value) => setValue('status', value)}>
+                <FieldLabel htmlFor="status" required>
+                  Status
+                </FieldLabel>
+                <Select onValueChange={(value) => setValue('status', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="on-hold">On Hold</SelectItem>
+                    <SelectItem value="pitched">Pitched</SelectItem>
+                    <SelectItem value="negotiating">Negotiating</SelectItem>
+                    <SelectItem value="on-hold">On Hold / Ignored</SelectItem>
                     <SelectItem value="cancelled">Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
@@ -152,14 +163,18 @@ export default function NewClientPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <FieldLabel htmlFor="startDate">Start Date</FieldLabel>
+                <FieldLabel htmlFor="startDate" required>
+                  Start Date
+                </FieldLabel>
                 <Input id="startDate" type="date" {...register('startDate')} />
                 {errors.startDate && (
                   <p className="text-red-500 text-sm">{errors.startDate.message}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <FieldLabel htmlFor="endDate">End Date</FieldLabel>
+                <FieldLabel htmlFor="endDate" required>
+                  End Date
+                </FieldLabel>
                 <Input id="endDate" type="date" {...register('endDate')} />
               </div>
             </div>

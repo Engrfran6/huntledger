@@ -1,5 +1,6 @@
 'use client';
 
+import {FieldLabel} from '@/components/dashboard/shared/custom-label';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,21 +31,21 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
-import {useToast} from '@/components/ui/use-toast';
 import {deleteClient, fetchClient, updateClient} from '@/lib/api';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, Loader2, Trash} from 'lucide-react';
 import Link from 'next/link';
-import {useRouter} from 'next/navigation';
+import {useParams, useRouter} from 'next/navigation';
 import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
+import {toast} from 'sonner';
 import * as yup from 'yup';
 
 // Define the validation schema with Yup
 const clientSchema = yup.object({
   name: yup.string().required('Client name is required'),
-  company: yup.string(),
+  company: yup.string().optional(),
   project: yup.string().required('Project name is required'),
   status: yup.string().required('Status is required'),
   startDate: yup.string().required('Start date is required'),
@@ -58,9 +59,9 @@ const clientSchema = yup.object({
 
 type ClientFormValues = yup.InferType<typeof clientSchema>;
 
-export default function EditClientPage({params}: {params: {id: string}}) {
+export default function EditClientPage() {
   const router = useRouter();
-  const {toast} = useToast();
+  const {id} = useParams<{id: string; item: string}>();
   const queryClient = useQueryClient();
 
   // Set up React Hook Form with Yup validation
@@ -83,8 +84,8 @@ export default function EditClientPage({params}: {params: {id: string}}) {
 
   // Fetch client data
   const {data: client, isLoading} = useQuery({
-    queryKey: ['client', params.id],
-    queryFn: () => fetchClient(params.id),
+    queryKey: ['client', id],
+    queryFn: () => fetchClient(id as string),
   });
 
   // Update form values when client data is loaded
@@ -111,19 +112,14 @@ export default function EditClientPage({params}: {params: {id: string}}) {
     mutationFn: updateClient,
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['clients']});
-      queryClient.invalidateQueries({queryKey: ['client', params.id]});
-      toast({
-        title: 'Client updated successfully',
+      queryClient.invalidateQueries({queryKey: ['client', id]});
+      toast.success('Client updated successfully', {
         description: 'Your client information has been updated.',
       });
       router.push('/dashboard/clients');
     },
     onError: (error: any) => {
-      toast({
-        title: 'Error updating client',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error('Error updating client', {description: error.message});
     },
   });
 
@@ -132,29 +128,22 @@ export default function EditClientPage({params}: {params: {id: string}}) {
     mutationFn: deleteClient,
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['clients']});
-      toast({
-        title: 'Client deleted successfully',
-        description: 'Your client has been removed.',
-      });
+      toast.success('Client deleted successfully', {description: 'Your client has been removed.'});
       router.push('/dashboard/clients');
     },
     onError: (error: any) => {
-      toast({
-        title: 'Error deleting client',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error('Error deleting client', {description: error.message});
     },
   });
 
   // Form submission handler
   const onSubmit = (data: ClientFormValues) => {
-    updateMutation.mutate({id: params.id, ...data});
+    updateMutation.mutate({id: id, ...data});
   };
 
   // Delete handler
   const handleDelete = () => {
-    deleteMutation.mutate(params.id);
+    deleteMutation.mutate(id);
   };
 
   if (isLoading) {
@@ -225,7 +214,9 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="name"
                   render={({field}) => (
                     <FormItem>
-                      <FormFieldLabel>Client Name</FormFieldLabel>
+                      <FieldLabel htmlFor="client name" required>
+                        Client Name
+                      </FieldLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -238,7 +229,7 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="company"
                   render={({field}) => (
                     <FormItem>
-                      <FormFieldLabel>Company (Optional)</FormFieldLabel>
+                      <FieldLabel htmlFor="client name">Company</FieldLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -253,7 +244,9 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                 name="project"
                 render={({field}) => (
                   <FormItem>
-                    <FormFieldLabel>Project Name</FormFieldLabel>
+                    <FieldLabel htmlFor="project name" required>
+                      Project Name
+                    </FieldLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -268,7 +261,9 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="status"
                   render={({field}) => (
                     <FormItem>
-                      <FormFieldLabel>Status</FormFieldLabel>
+                      <FieldLabel htmlFor="Status" required>
+                        Status
+                      </FieldLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -291,7 +286,8 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="budget"
                   render={({field}) => (
                     <FormItem>
-                      <FormFieldLabel>Budget (Optional)</FormFieldLabel>
+                      <FieldLabel htmlFor="budget">Budget</FieldLabel>
+
                       <FormControl>
                         <Input {...field} placeholder="$5,000" />
                       </FormControl>
@@ -307,7 +303,9 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="startDate"
                   render={({field}) => (
                     <FormItem>
-                      <FormFieldLabel>Start Date</FormFieldLabel>
+                      <FieldLabel htmlFor="start date" required>
+                        Start Data
+                      </FieldLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -320,7 +318,8 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="endDate"
                   render={({field}) => (
                     <FormItem>
-                      <FormFieldLabel>End Date (Optional)</FormFieldLabel>
+                      <FieldLabel htmlFor="end date">End Data</FieldLabel>
+
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -336,7 +335,8 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="contactEmail"
                   render={({field}) => (
                     <FormItem>
-                      <FormFieldLabel>Contact Email (Optional)</FormFieldLabel>
+                      <FieldLabel htmlFor="email">Contact Email</FieldLabel>
+
                       <FormControl>
                         <Input type="email" {...field} />
                       </FormControl>
@@ -349,7 +349,8 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="contactPhone"
                   render={({field}) => (
                     <FormItem>
-                      <FormFieldLabel>Contact Phone (Optional)</FormFieldLabel>
+                      <FieldLabel htmlFor="phone">Contact Phone</FieldLabel>
+
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -364,7 +365,8 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                 name="notes"
                 render={({field}) => (
                   <FormItem>
-                    <FormFieldLabel>Notes</FormFieldLabel>
+                    <FieldLabel htmlFor="notes">Notes</FieldLabel>
+
                     <FormControl>
                       <Textarea
                         {...field}

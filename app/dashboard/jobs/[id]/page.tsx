@@ -1,5 +1,6 @@
 'use client';
 
+import {FieldLabel} from '@/components/dashboard/shared/custom-label';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,7 +35,7 @@ import {yupResolver} from '@hookform/resolvers/yup';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, Loader2, Trash} from 'lucide-react';
 import Link from 'next/link';
-import {useRouter} from 'next/navigation';
+import {useParams, useRouter} from 'next/navigation';
 import {useEffect} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import {toast} from 'sonner';
@@ -66,8 +67,9 @@ const schema = yup.object().shape({
   startDate: yup.string().required('Offer start date is required'),
 });
 
-export default function EditJobPage({params}: {params: {id: string}}) {
+export default function EditJobPage() {
   const router = useRouter();
+  const {id} = useParams<{id: string; item: string}>();
   const queryClient = useQueryClient();
 
   const {
@@ -95,8 +97,8 @@ export default function EditJobPage({params}: {params: {id: string}}) {
   const status = watch('status');
 
   const {data: job, isLoading} = useQuery({
-    queryKey: ['job', params.id],
-    queryFn: () => fetchJob(params.id),
+    queryKey: ['job', id],
+    queryFn: () => fetchJob(id),
   });
 
   useEffect(() => {
@@ -115,7 +117,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
     mutationFn: updateJob,
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['jobs']});
-      queryClient.invalidateQueries({queryKey: ['job', params.id]});
+      queryClient.invalidateQueries({queryKey: ['job', id]});
       toast.success('Job updated successfully', {
         description: 'Your job application has been updated.',
       });
@@ -157,11 +159,11 @@ export default function EditJobPage({params}: {params: {id: string}}) {
       });
       return;
     }
-    updateMutation.mutate({id: params.id, ...data});
+    updateMutation.mutate({id: id, ...data});
   };
 
   const handleDelete = () => {
-    deleteMutation.mutate(params.id);
+    deleteMutation.mutate(id);
   };
 
   if (isLoading) {
@@ -228,7 +230,9 @@ export default function EditJobPage({params}: {params: {id: string}}) {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <FieldLabel htmlFor="company">Company Name</FieldLabel>
+                <FieldLabel htmlFor="company" required>
+                  Company Name
+                </FieldLabel>
                 <Controller
                   name="company"
                   control={control}
@@ -238,7 +242,9 @@ export default function EditJobPage({params}: {params: {id: string}}) {
               </div>
 
               <div className="space-y-2">
-                <FieldLabel htmlFor="position">Job Title</FieldLabel>
+                <FieldLabel htmlFor="position" required>
+                  Job Title
+                </FieldLabel>
                 <Controller
                   name="position"
                   control={control}
@@ -263,7 +269,9 @@ export default function EditJobPage({params}: {params: {id: string}}) {
               </div>
 
               <div className="space-y-2">
-                <FieldLabel htmlFor="status">Status</FieldLabel>
+                <FieldLabel htmlFor="status" required>
+                  Status
+                </FieldLabel>
                 <Controller
                   name="status"
                   control={control}
@@ -312,7 +320,9 @@ export default function EditJobPage({params}: {params: {id: string}}) {
             </div>
 
             <div className="space-y-2">
-              <FieldLabel htmlFor="appliedDate">Date Applied</FieldLabel>
+              <FieldLabel htmlFor="appliedDate" required>
+                Date Applied
+              </FieldLabel>
               <Controller
                 name="appliedDate"
                 control={control}
@@ -325,7 +335,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
 
             {status === 'interview' && (
               <div className="space-y-2">
-                <FieldLabel htmlFor="interviewDate">
+                <FieldLabel htmlFor="interviewDate" required>
                   Interview Date <span className="text-red-500">*</span>
                 </FieldLabel>
                 <Controller
@@ -344,7 +354,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
 
             {status === 'offer' && (
               <div className="space-y-2">
-                <FieldLabel htmlFor="startDate">
+                <FieldLabel htmlFor="startDate" required>
                   Start Date <span className="text-red-500">*</span>
                 </FieldLabel>
                 <Controller

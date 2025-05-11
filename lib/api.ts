@@ -1,5 +1,12 @@
 import {auth, db} from '@/lib/firebase';
-import type {Client, Job, Subcontractor, Task, UserPreferences} from '@/lib/types';
+import type {
+  Client,
+  Job,
+  NotificationPreferences,
+  Subcontractor,
+  Task,
+  UserPreferences,
+} from '@/lib/types';
 import {
   addDoc,
   collection,
@@ -331,4 +338,80 @@ export async function updateUserPreferences(preferences: Partial<UserPreferences
   } else {
     await updateDoc(docRef, preferences);
   }
+}
+
+// NOTIFICATION PREFERENCES
+
+// Update notification preferences specifically
+export async function updateNotificationPreferences(
+  notifications: NotificationPreferences
+): Promise<void> {
+  if (!auth.currentUser) {
+    throw new Error('You must be logged in to update notifications');
+  }
+
+  const docRef = doc(db, 'userPreferences', auth.currentUser.uid);
+  const docSnap = await getDoc(docRef);
+
+  if (!docSnap.exists()) {
+    // If user preferences don't exist yet, create them with these notifications
+    await setDoc(docRef, {notifications});
+  } else {
+    // Update just the notifications part of the preferences
+    await updateDoc(docRef, {notifications});
+  }
+}
+
+// Fetch notification preferences specifically
+export async function fetchNotificationPreferences(): Promise<NotificationPreferences | null> {
+  if (!auth.currentUser) {
+    return null;
+  }
+  const docRef = doc(db, 'userPreferences', auth.currentUser.uid);
+  const docSnap = await getDoc(docRef);
+
+  if (!docSnap.exists() || !docSnap.data().notifications) {
+    return null;
+  }
+
+  return docSnap.data().notifications as NotificationPreferences;
+}
+
+// REMINDERS
+
+// Save a record of sent reminders to prevent duplicates
+export async function recordSentReminder(
+  type: string,
+  entityId: string,
+  sentAt: Date = new Date()
+): Promise<string> {
+  if (!auth.currentUser) {
+    throw new Error('You must be logged in to view reminder record');
+  }
+  const reminderRef = await addDoc(collection(db, 'sentReminders'), {
+    userId: auth.currentUser.uid,
+    type,
+    entityId,
+    sentAt: sentAt,
+  });
+
+  return reminderRef.id;
+}
+
+// Check if a reminder has already been sent
+export async function checkReminderSent(type: string, entityId: string): Promise<boolean> {
+  if (!auth.currentUser) {
+    throw new Error('You must be logged to view sent reminders');
+  }
+
+  const remindersRef = collection(db, 'sentReminders');
+  const q = query(
+    remindersRef,
+    where('userId', '==', auth.currentUser.uid),
+    where('type', '==', type),
+    where('entityId', '==', entityId)
+  );
+
+  const querySnapshot = await getDocs(q);
+  return !querySnapshot.empty;
 }

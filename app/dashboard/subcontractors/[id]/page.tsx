@@ -12,7 +12,7 @@ import {
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/components/ui/use-toast';
-import {useRouter} from 'next/navigation';
+import {useParams, useRouter} from 'next/navigation';
 import {useEffect} from 'react';
 
 import {
@@ -26,7 +26,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import {Form, FormControl, FormField, FormItem, FormMessage} from '@/components/ui/form';
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {deleteSubcontractor, fetchSubcontractor, updateSubcontractor} from '@/lib/api';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -47,10 +47,11 @@ const subcontractorSchema = yup.object({
 
 type SubcontractorFormValues = yup.InferType<typeof subcontractorSchema>;
 
-export default function EditSubcontractorPage({params}: {params: {id: string}}) {
+export default function EditSubcontractorPage() {
   const router = useRouter();
   const {toast} = useToast();
   const queryClient = useQueryClient();
+  const {id} = useParams<{id: string; item: string}>();
 
   // Set up React Hook Form with Yup validation
   const form = useForm<SubcontractorFormValues>({
@@ -67,8 +68,8 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
 
   // Fetch subcontractor data
   const {data: subcontractor, isLoading} = useQuery({
-    queryKey: ['subcontractor', params.id],
-    queryFn: () => fetchSubcontractor(params.id),
+    queryKey: ['subcontractor', id],
+    queryFn: () => fetchSubcontractor(id),
   });
 
   // Update form values when subcontractor data is loaded
@@ -90,7 +91,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
     mutationFn: updateSubcontractor,
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['subcontractors']});
-      queryClient.invalidateQueries({queryKey: ['subcontractor', params.id]});
+      queryClient.invalidateQueries({queryKey: ['subcontractor', id]});
       toast({
         title: 'Subcontractor updated successfully',
         description: 'Your subcontractor information has been updated.',
@@ -128,12 +129,12 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
 
   // Form submission handler
   const onSubmit = (data: SubcontractorFormValues) => {
-    updateMutation.mutate({id: params.id, ...data});
+    updateMutation.mutate({id: id, ...data});
   };
 
   // Delete handler
   const handleDelete = () => {
-    deleteMutation.mutate(params.id);
+    deleteMutation.mutate(id);
   };
 
   if (isLoading) {
@@ -205,7 +206,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
                 name="name"
                 render={({field}) => (
                   <FormItem>
-                    <FormFieldLabel>Name</FormFieldLabel>
+                    <FormLabel>Name</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -220,7 +221,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
                   name="email"
                   render={({field}) => (
                     <FormItem>
-                      <FormFieldLabel>Email</FormFieldLabel>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input type="email" {...field} />
                       </FormControl>
@@ -233,7 +234,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
                   name="phone"
                   render={({field}) => (
                     <FormItem>
-                      <FormFieldLabel>Phone</FormFieldLabel>
+                      <FormLabel>Phone</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -249,7 +250,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
                   name="expertise"
                   render={({field}) => (
                     <FormItem>
-                      <FormFieldLabel>Expertise/Skills</FormFieldLabel>
+                      <FormLabel>Expertise/Skills</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="e.g., UI Design, Frontend Development" />
                       </FormControl>
@@ -262,7 +263,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
                   name="rate"
                   render={({field}) => (
                     <FormItem>
-                      <FormFieldLabel>Rate (Optional)</FormFieldLabel>
+                      <FormLabel>Rate (Optional)</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="e.g., $50/hr, $500/project" />
                       </FormControl>
@@ -277,7 +278,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
                 name="notes"
                 render={({field}) => (
                   <FormItem>
-                    <FormFieldLabel>Notes</FormFieldLabel>
+                    <FormLabel>Notes</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
