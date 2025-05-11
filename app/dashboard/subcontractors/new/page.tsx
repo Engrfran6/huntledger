@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/components/ui/use-toast';
 import {addSubcontractor} from '@/lib/api';
@@ -84,13 +83,13 @@ export default function NewSubcontractorPage() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <FieldLabel htmlFor="name">Name</FieldLabel>
               <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
                   name="email"
@@ -100,14 +99,14 @@ export default function NewSubcontractorPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
+                <FieldLabel htmlFor="phone">Phone</FieldLabel>
                 <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} />
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="expertise">Expertise/Skills</Label>
+                <FieldLabel htmlFor="expertise">Expertise/Skills</FieldLabel>
                 <Input
                   id="expertise"
                   name="expertise"
@@ -118,7 +117,7 @@ export default function NewSubcontractorPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="rate">Rate (Optional)</Label>
+                <FieldLabel htmlFor="rate">Rate (Optional)</FieldLabel>
                 <Input
                   id="rate"
                   name="rate"
@@ -130,7 +129,7 @@ export default function NewSubcontractorPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
+              <FieldLabel htmlFor="notes">Notes</FieldLabel>
               <Textarea
                 id="notes"
                 name="notes"

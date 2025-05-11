@@ -94,7 +94,7 @@ export default function TasksPage() {
         <CardContent>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Client</label>
+              <FieldLabel className="text-sm font-medium">Client</FieldLabel>
               <Select value={selectedClient} onValueChange={setSelectedClient}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select client" />
@@ -111,7 +111,7 @@ export default function TasksPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Subcontractor</label>
+              <FieldLabel className="text-sm font-medium">Subcontractor</FieldLabel>
               <Select value={selectedSubcontractor} onValueChange={setSelectedSubcontractor}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select subcontractor" />
@@ -129,7 +129,7 @@ export default function TasksPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
+              <FieldLabel className="text-sm font-medium">Status</FieldLabel>
               <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select status" />

@@ -64,9 +64,20 @@ export interface Task {
 
 export type UserType = 'jobSeeker' | 'freelancer';
 
+export interface NotificationPreferences {
+  emailNotifications: boolean;
+  weeklyDigest: boolean;
+  applicationReminders?: boolean; // For job seekers
+  deadlineReminders?: boolean; // For freelancers
+  clientUpdates?: boolean; // For freelancers
+  paymentReminders?: boolean; // For freelancers
+  interviewReminders?: boolean; // For job seekers
+  offerDeadlineReminders?: boolean; // For job seekers
+}
+
 export interface UserPreferences {
   userType: UserType;
   theme?: string;
-  emailNotifications?: boolean;
   rememberUserType?: boolean;
+  notifications: NotificationPreferences;
 }

@@ -19,13 +19,10 @@ import {cn} from '@/lib/utils';
 import {
   BarChart3,
   BriefcaseBusiness,
-  Calendar,
   FolderKanban,
   LayoutDashboard,
-  ListTodo,
   LogOut,
   Settings,
-  UserCog,
   Users,
 } from 'lucide-react';
 import {useTheme} from 'next-themes';
@@ -51,11 +48,11 @@ const jobSeekerNavItems = [
     href: '/dashboard/analytics',
     icon: BarChart3,
   },
-  {
-    title: 'Calendar',
-    href: '/dashboard/calendar',
-    icon: Calendar,
-  },
+  // {
+  //   title: 'Calendar',
+  //   href: '/dashboard/calendar',
+  //   icon: Calendar,
+  // },
 ];
 
 const freelancerNavItems = [
@@ -74,26 +71,26 @@ const freelancerNavItems = [
     href: '/dashboard/projects',
     icon: FolderKanban,
   },
-  {
-    title: 'Tasks',
-    href: '/dashboard/tasks',
-    icon: ListTodo,
-  },
-  {
-    title: 'Subcontractors',
-    href: '/dashboard/subcontractors',
-    icon: UserCog,
-  },
+  // {
+  //   title: 'Tasks',
+  //   href: '/dashboard/tasks',
+  //   icon: ListTodo,
+  // },
+  // {
+  //   title: 'Subcontractors',
+  //   href: '/dashboard/subcontractors',
+  //   icon: UserCog,
+  // },
   {
     title: 'Analytics',
     href: '/dashboard/analytics',
     icon: BarChart3,
   },
-  {
-    title: 'Calendar',
-    href: '/dashboard/calendar',
-    icon: Calendar,
-  },
+  // {
+  //   title: 'Calendar',
+  //   href: '/dashboard/calendar',
+  //   icon: Calendar,
+  // },
 ];
 
 // Common navigation items

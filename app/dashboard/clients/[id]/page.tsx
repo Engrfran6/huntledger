@@ -20,7 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Form, FormControl, FormField, FormItem, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {
   Select,
@@ -225,7 +225,7 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="name"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Client Name</FormLabel>
+                      <FormFieldLabel>Client Name</FormFieldLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -238,7 +238,7 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="company"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Company (Optional)</FormLabel>
+                      <FormFieldLabel>Company (Optional)</FormFieldLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -253,7 +253,7 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                 name="project"
                 render={({field}) => (
                   <FormItem>
-                    <FormLabel>Project Name</FormLabel>
+                    <FormFieldLabel>Project Name</FormFieldLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -268,7 +268,7 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="status"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Status</FormLabel>
+                      <FormFieldLabel>Status</FormFieldLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -291,7 +291,7 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="budget"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Budget (Optional)</FormLabel>
+                      <FormFieldLabel>Budget (Optional)</FormFieldLabel>
                       <FormControl>
                         <Input {...field} placeholder="$5,000" />
                       </FormControl>
@@ -307,7 +307,7 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="startDate"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Start Date</FormLabel>
+                      <FormFieldLabel>Start Date</FormFieldLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -320,7 +320,7 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="endDate"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>End Date (Optional)</FormLabel>
+                      <FormFieldLabel>End Date (Optional)</FormFieldLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -336,7 +336,7 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="contactEmail"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Contact Email (Optional)</FormLabel>
+                      <FormFieldLabel>Contact Email (Optional)</FormFieldLabel>
                       <FormControl>
                         <Input type="email" {...field} />
                       </FormControl>
@@ -349,7 +349,7 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                   name="contactPhone"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Contact Phone (Optional)</FormLabel>
+                      <FormFieldLabel>Contact Phone (Optional)</FormFieldLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -364,7 +364,7 @@ export default function EditClientPage({params}: {params: {id: string}}) {
                 name="notes"
                 render={({field}) => (
                   <FormItem>
-                    <FormLabel>Notes</FormLabel>
+                    <FormFieldLabel>Notes</FormFieldLabel>
                     <FormControl>
                       <Textarea
                         {...field}

@@ -16,7 +16,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
 
 import {useSignUp} from '@/lib/auth-hooks';
 import {useUserStore} from '@/lib/stores/user-store';
@@ -74,7 +73,7 @@ export default function SignUpPage() {
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
                 id="email"
                 type="email"
@@ -85,7 +84,7 @@ export default function SignUpPage() {
               {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
             </div>
             <div className="space-y-2 relative">
-              <Label htmlFor="password">Password</Label>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
@@ -112,7 +111,7 @@ export default function SignUpPage() {
             </Button>
             <div className="text-center text-sm">
               Already have an account?{' '}
-              <Link href="/signin" className="text-orange-600 hover:underline">
+              <Link href="/auth/signin" className="text-orange-600 hover:underline">
                 Sign in
               </Link>
             </div>

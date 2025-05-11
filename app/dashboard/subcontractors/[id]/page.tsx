@@ -26,7 +26,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Form, FormControl, FormField, FormItem, FormMessage} from '@/components/ui/form';
 import {deleteSubcontractor, fetchSubcontractor, updateSubcontractor} from '@/lib/api';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -205,7 +205,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
                 name="name"
                 render={({field}) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormFieldLabel>Name</FormFieldLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -220,7 +220,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
                   name="email"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormFieldLabel>Email</FormFieldLabel>
                       <FormControl>
                         <Input type="email" {...field} />
                       </FormControl>
@@ -233,7 +233,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
                   name="phone"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Phone</FormLabel>
+                      <FormFieldLabel>Phone</FormFieldLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -249,7 +249,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
                   name="expertise"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Expertise/Skills</FormLabel>
+                      <FormFieldLabel>Expertise/Skills</FormFieldLabel>
                       <FormControl>
                         <Input {...field} placeholder="e.g., UI Design, Frontend Development" />
                       </FormControl>
@@ -262,7 +262,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
                   name="rate"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Rate (Optional)</FormLabel>
+                      <FormFieldLabel>Rate (Optional)</FormFieldLabel>
                       <FormControl>
                         <Input {...field} placeholder="e.g., $50/hr, $500/project" />
                       </FormControl>
@@ -277,7 +277,7 @@ export default function EditSubcontractorPage({params}: {params: {id: string}}) 
                 name="notes"
                 render={({field}) => (
                   <FormItem>
-                    <FormLabel>Notes</FormLabel>
+                    <FormFieldLabel>Notes</FormFieldLabel>
                     <FormControl>
                       <Textarea
                         {...field}

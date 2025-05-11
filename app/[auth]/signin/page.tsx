@@ -23,10 +23,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
 import Link from 'next/link';
 import {useState} from 'react';
 
+import {FieldLabel} from '@/components/dashboard/shared/custom-label';
 import {useSignIn} from '@/lib/auth-hooks';
 import {auth} from '@/lib/firebase';
 import {sendPasswordResetEmail} from 'firebase/auth';
@@ -95,7 +95,9 @@ export default function SignInPage() {
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <FieldLabel htmlFor="email" required>
+                Email
+              </FieldLabel>
               <Input
                 id="email"
                 type="email"
@@ -106,7 +108,9 @@ export default function SignInPage() {
               {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
             </div>
             <div className="space-y-2 relative">
-              <Label htmlFor="password">Password</Label>
+              <FieldLabel htmlFor="password" required>
+                Password
+              </FieldLabel>
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
@@ -141,7 +145,10 @@ export default function SignInPage() {
             <div className="flex flex-col md:flex-row items-center gap-2 md:justify-between w-full text-sm px-4">
               <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
                 <DialogTrigger>
-                  <Button variant="link" className="text-orange-600 hover:underline p-0 h-auto">
+                  <Button
+                    asChild
+                    variant="link"
+                    className="text-orange-600 hover:underline p-0 h-auto">
                     Forgot password?
                   </Button>
                 </DialogTrigger>
@@ -155,7 +162,9 @@ export default function SignInPage() {
                   <form onSubmit={handleResetPassword}>
                     <div className="space-y-4 py-4">
                       <div className="space-y-2">
-                        <Label htmlFor="reset-email">Email</Label>
+                        <FieldLabel htmlFor="reset-email" required>
+                          Email
+                        </FieldLabel>
                         <Input
                           id="reset-email"
                           type="email"

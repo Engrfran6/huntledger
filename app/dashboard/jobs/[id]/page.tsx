@@ -21,7 +21,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -229,7 +228,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="company">Company Name</Label>
+                <FieldLabel htmlFor="company">Company Name</FieldLabel>
                 <Controller
                   name="company"
                   control={control}
@@ -239,7 +238,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="position">Job Title</Label>
+                <FieldLabel htmlFor="position">Job Title</FieldLabel>
                 <Controller
                   name="position"
                   control={control}
@@ -253,7 +252,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
+                <FieldLabel htmlFor="location">Location</FieldLabel>
                 <Controller
                   name="location"
                   control={control}
@@ -264,7 +263,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+                <FieldLabel htmlFor="status">Status</FieldLabel>
                 <Controller
                   name="status"
                   control={control}
@@ -289,7 +288,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="url">Job URL</Label>
+                <FieldLabel htmlFor="url">Job URL</FieldLabel>
                 <Controller
                   name="url"
                   control={control}
@@ -301,7 +300,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="salary">Salary Range</Label>
+                <FieldLabel htmlFor="salary">Salary Range</FieldLabel>
                 <Controller
                   name="salary"
                   control={control}
@@ -313,7 +312,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="appliedDate">Date Applied</Label>
+              <FieldLabel htmlFor="appliedDate">Date Applied</FieldLabel>
               <Controller
                 name="appliedDate"
                 control={control}
@@ -326,9 +325,9 @@ export default function EditJobPage({params}: {params: {id: string}}) {
 
             {status === 'interview' && (
               <div className="space-y-2">
-                <Label htmlFor="interviewDate">
+                <FieldLabel htmlFor="interviewDate">
                   Interview Date <span className="text-red-500">*</span>
-                </Label>
+                </FieldLabel>
                 <Controller
                   name="interviewDate"
                   control={control}
@@ -345,9 +344,9 @@ export default function EditJobPage({params}: {params: {id: string}}) {
 
             {status === 'offer' && (
               <div className="space-y-2">
-                <Label htmlFor="startDate">
+                <FieldLabel htmlFor="startDate">
                   Start Date <span className="text-red-500">*</span>
-                </Label>
+                </FieldLabel>
                 <Controller
                   name="startDate"
                   control={control}
@@ -363,7 +362,7 @@ export default function EditJobPage({params}: {params: {id: string}}) {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
+              <FieldLabel htmlFor="notes">Notes</FieldLabel>
               <Controller
                 name="notes"
                 control={control}

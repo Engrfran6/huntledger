@@ -1,5 +1,6 @@
 'use client';
 
+import {FieldLabel} from '@/components/dashboard/shared/custom-label';
 import {Button} from '@/components/ui/button';
 import {
   Card,
@@ -10,7 +11,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -29,7 +29,7 @@ import {useForm} from 'react-hook-form';
 import {toast} from 'sonner';
 import * as yup from 'yup';
 
-const jobSchema = yup.object().shape({
+const baseSchema = {
   company: yup.string().required('Company name is required'),
   position: yup.string().required('Job title is required'),
   location: yup.string().optional(),
@@ -38,8 +38,26 @@ const jobSchema = yup.object().shape({
   salary: yup.string().optional(),
   notes: yup.string().optional(),
   appliedDate: yup.string().required('Date applied is required'),
-  interviewDate: yup.string().required('Interview date is required'),
-  startDate: yup.string().required('Offer start date is required'),
+  interviewDate: yup.string().optional(),
+  startDate: yup.string().optional(),
+};
+
+const jobSchema = yup.object().shape({
+  ...baseSchema,
+  interviewDate: yup
+    .string()
+    .when('status', (status, schema) =>
+      (status?.[0] as string) === 'interview'
+        ? schema.required('Interview date is required')
+        : schema.optional()
+    ),
+  startDate: yup
+    .string()
+    .when('status', (status, schema) =>
+      (status?.[0] as string) === 'offer'
+        ? schema.required('Offer start date is required')
+        : schema.optional()
+    ),
 });
 
 type JobFormData = yup.InferType<typeof jobSchema>;
@@ -70,7 +88,7 @@ export default function NewJobPage() {
     },
   });
 
-  const status = watch('status');
+  const status = watch('status') as string;
 
   const mutation = useMutation({
     mutationFn: addJob,
@@ -131,12 +149,16 @@ export default function NewJobPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="company">Company Name</Label>
+                <FieldLabel htmlFor="company" required>
+                  Company Name
+                </FieldLabel>
                 <Input id="company" {...register('company')} />
                 {errors.company && <p className="text-red-500 text-sm">{errors.company.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="position">Job Title</Label>
+                <FieldLabel htmlFor="position" required>
+                  Job Title
+                </FieldLabel>
                 <Input id="position" {...register('position')} />
                 {errors.position && (
                   <p className="text-red-500 text-sm">{errors.position.message}</p>
@@ -146,11 +168,11 @@ export default function NewJobPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
+                <FieldLabel htmlFor="location">Location</FieldLabel>
                 <Input id="location" {...register('location')} placeholder="Remote, US, etc." />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+                <FieldLabel htmlFor="status">Status</FieldLabel>
                 <Select defaultValue="applied" onValueChange={(value) => setValue('status', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
@@ -169,9 +191,9 @@ export default function NewJobPage() {
 
             {status === 'interview' && (
               <div className="space-y-2">
-                <Label htmlFor="interviewDate">
-                  Interview Date <span className="text-red-500">*</span>
-                </Label>
+                <FieldLabel htmlFor="interviewDate" required>
+                  Interview Date
+                </FieldLabel>
                 <Input
                   id="interviewDate"
                   type="datetime-local"
@@ -186,9 +208,10 @@ export default function NewJobPage() {
 
             {status === 'offer' && (
               <div className="space-y-2">
-                <Label htmlFor="startDate">
-                  Start Date <span className="text-red-500">*</span>
-                </Label>
+                <FieldLabel htmlFor="startDate" required>
+                  {' '}
+                  Start Date
+                </FieldLabel>
                 <Input id="startDate" type="date" {...register('startDate')} required />
                 <p className="text-xs text-muted-foreground">
                   You'll receive a reminder 24 hours before your start date.
@@ -198,7 +221,7 @@ export default function NewJobPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="url">Job URL</Label>
+                <FieldLabel htmlFor="url">Job URL</FieldLabel>
                 <Input
                   id="url"
                   type="url"
@@ -208,13 +231,15 @@ export default function NewJobPage() {
                 {errors.url && <p className="text-red-500 text-sm">{errors.url.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="salary">Salary Range</Label>
+                <FieldLabel htmlFor="salary">Salary Range</FieldLabel>
                 <Input id="salary" {...register('salary')} placeholder="$80,000 - $100,000" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="appliedDate">Date Applied</Label>
+              <FieldLabel htmlFor="appliedDate" required>
+                Date Applied
+              </FieldLabel>
               <Input id="appliedDate" type="date" {...register('appliedDate')} />
               {errors.appliedDate && (
                 <p className="text-red-500 text-sm">{errors.appliedDate.message}</p>
@@ -222,7 +247,7 @@ export default function NewJobPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
+              <FieldLabel htmlFor="notes">Notes</FieldLabel>
               <Textarea
                 id="notes"
                 {...register('notes')}

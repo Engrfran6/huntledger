@@ -20,7 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Form, FormControl, FormField, FormItem, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {
   Select,
@@ -251,7 +251,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                 name="title"
                 render={({field}) => (
                   <FormItem>
-                    <FormLabel>Task Title</FormLabel>
+                    <FormFieldLabel>Task Title</FormFieldLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -265,7 +265,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                 name="description"
                 render={({field}) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormFieldLabel>Description</FormFieldLabel>
                     <FormControl>
                       <Textarea
                         {...field}
@@ -284,7 +284,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                   name="clientId"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Client</FormLabel>
+                      <FormFieldLabel>Client</FormFieldLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -308,7 +308,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                   name="subcontractorId"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Assign To (Optional)</FormLabel>
+                      <FormFieldLabel>Assign To (Optional)</FormFieldLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -336,7 +336,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                   name="status"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Status</FormLabel>
+                      <FormFieldLabel>Status</FormFieldLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -359,7 +359,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                   name="priority"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Priority</FormLabel>
+                      <FormFieldLabel>Priority</FormFieldLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -384,7 +384,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                   name="startDate"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Start Date</FormLabel>
+                      <FormFieldLabel>Start Date</FormFieldLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -397,7 +397,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                   name="dueDate"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Due Date</FormLabel>
+                      <FormFieldLabel>Due Date</FormFieldLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -410,7 +410,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                   name="completedDate"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Completed Date</FormLabel>
+                      <FormFieldLabel>Completed Date</FormFieldLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -426,7 +426,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                   name="budget"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Budget</FormLabel>
+                      <FormFieldLabel>Budget</FormFieldLabel>
                       <FormControl>
                         <Input {...field} placeholder="$500" />
                       </FormControl>
@@ -439,7 +439,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                   name="paymentStatus"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Payment Status</FormLabel>
+                      <FormFieldLabel>Payment Status</FormFieldLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -461,7 +461,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                   name="paymentAmount"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Payment Amount</FormLabel>
+                      <FormFieldLabel>Payment Amount</FormFieldLabel>
                       <FormControl>
                         <Input {...field} placeholder="$250" />
                       </FormControl>
@@ -476,7 +476,7 @@ export default function EditTaskPage({params}: {params: {id: string}}) {
                 name="notes"
                 render={({field}) => (
                   <FormItem>
-                    <FormLabel>Notes</FormLabel>
+                    <FormFieldLabel>Notes</FormFieldLabel>
                     <FormControl>
                       <Textarea
                         {...field}

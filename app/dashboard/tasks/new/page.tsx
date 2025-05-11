@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -129,7 +128,7 @@ export default function NewTaskPage() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Task Title</Label>
+              <FieldLabel htmlFor="title">Task Title</FieldLabel>
               <Input
                 id="title"
                 name="title"
@@ -140,7 +139,7 @@ export default function NewTaskPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <FieldLabel htmlFor="description">Description</FieldLabel>
               <Textarea
                 id="description"
                 name="description"
@@ -153,7 +152,7 @@ export default function NewTaskPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="clientId">Client</Label>
+                <FieldLabel htmlFor="clientId">Client</FieldLabel>
                 <Select
                   value={formData.clientId}
                   onValueChange={(value) => handleSelectChange('clientId', value)}
@@ -171,7 +170,7 @@ export default function NewTaskPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="subcontractorId">Assign To (Optional)</Label>
+                <FieldLabel htmlFor="subcontractorId">Assign To (Optional)</FieldLabel>
                 <Select
                   value={formData.subcontractorId}
                   onValueChange={(value) => handleSelectChange('subcontractorId', value)}>
@@ -192,7 +191,7 @@ export default function NewTaskPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+                <FieldLabel htmlFor="status">Status</FieldLabel>
                 <Select
                   value={formData.status}
                   onValueChange={(value) => handleSelectChange('status', value)}>
@@ -208,7 +207,7 @@ export default function NewTaskPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="priority">Priority</Label>
+                <FieldLabel htmlFor="priority">Priority</FieldLabel>
                 <Select
                   value={formData.priority}
                   onValueChange={(value) => handleSelectChange('priority', value)}>
@@ -226,7 +225,7 @@ export default function NewTaskPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="startDate">Start Date</Label>
+                <FieldLabel htmlFor="startDate">Start Date</FieldLabel>
                 <Input
                   id="startDate"
                   name="startDate"
@@ -236,7 +235,7 @@ export default function NewTaskPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="dueDate">Due Date (Optional)</Label>
+                <FieldLabel htmlFor="dueDate">Due Date (Optional)</FieldLabel>
                 <Input
                   id="dueDate"
                   name="dueDate"
@@ -249,7 +248,7 @@ export default function NewTaskPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="budget">Budget (Optional)</Label>
+                <FieldLabel htmlFor="budget">Budget (Optional)</FieldLabel>
                 <Input
                   id="budget"
                   name="budget"
@@ -259,7 +258,7 @@ export default function NewTaskPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="paymentStatus">Payment Status</Label>
+                <FieldLabel htmlFor="paymentStatus">Payment Status</FieldLabel>
                 <Select
                   value={formData.paymentStatus}
                   onValueChange={(value) => handleSelectChange('paymentStatus', value)}>
@@ -276,7 +275,7 @@ export default function NewTaskPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="paymentAmount">Payment Amount (Optional)</Label>
+              <FieldLabel htmlFor="paymentAmount">Payment Amount (Optional)</FieldLabel>
               <Input
                 id="paymentAmount"
                 name="paymentAmount"
@@ -287,7 +286,7 @@ export default function NewTaskPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
+              <FieldLabel htmlFor="notes">Notes</FieldLabel>
               <Textarea
                 id="notes"
                 name="notes"

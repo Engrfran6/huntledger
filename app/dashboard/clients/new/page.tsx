@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -113,25 +112,25 @@ export default function NewClientPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="name">Client Name</Label>
+                <FieldLabel htmlFor="name">Client Name</FieldLabel>
                 <Input id="name" {...register('name')} />
                 {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="company">Company</Label>
+                <FieldLabel htmlFor="company">Company</FieldLabel>
                 <Input id="company" {...register('company')} />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="project">Project Name</Label>
+              <FieldLabel htmlFor="project">Project Name</FieldLabel>
               <Input id="project" {...register('project')} />
               {errors.project && <p className="text-red-500 text-sm">{errors.project.message}</p>}
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Status</Label>
+                <FieldLabel>Status</FieldLabel>
                 <Select defaultValue="active" onValueChange={(value) => setValue('status', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
@@ -146,41 +145,41 @@ export default function NewClientPage() {
                 {errors.status && <p className="text-red-500 text-sm">{errors.status.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="budget">Budget</Label>
+                <FieldLabel htmlFor="budget">Budget</FieldLabel>
                 <Input id="budget" {...register('budget')} placeholder="$5,000" />
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="startDate">Start Date</Label>
+                <FieldLabel htmlFor="startDate">Start Date</FieldLabel>
                 <Input id="startDate" type="date" {...register('startDate')} />
                 {errors.startDate && (
                   <p className="text-red-500 text-sm">{errors.startDate.message}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="endDate">End Date</Label>
+                <FieldLabel htmlFor="endDate">End Date</FieldLabel>
                 <Input id="endDate" type="date" {...register('endDate')} />
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="contactEmail">Contact Email</Label>
+                <FieldLabel htmlFor="contactEmail">Contact Email</FieldLabel>
                 <Input id="contactEmail" type="email" {...register('contactEmail')} />
                 {errors.contactEmail && (
                   <p className="text-red-500 text-sm">{errors.contactEmail.message}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="contactPhone">Contact Phone</Label>
+                <FieldLabel htmlFor="contactPhone">Contact Phone</FieldLabel>
                 <Input id="contactPhone" {...register('contactPhone')} />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
+              <FieldLabel htmlFor="notes">Notes</FieldLabel>
               <Textarea
                 id="notes"
                 {...register('notes')}

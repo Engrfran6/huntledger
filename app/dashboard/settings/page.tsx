@@ -2,6 +2,7 @@
 
 import type React from 'react';
 
+import {FieldLabel} from '@/components/dashboard/shared/custom-label';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,8 +35,9 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Switch} from '@/components/ui/switch';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {useToast} from '@/components/ui/use-toast';
+import {fetchUserPreferences} from '@/lib/api';
 import {useAuthState} from '@/lib/auth-hooks';
+import {useUserStore} from '@/lib/stores/user-store';
 import {
   deleteUser,
   EmailAuthProvider,
@@ -43,11 +45,12 @@ import {
   updateEmail,
   updatePassword,
 } from 'firebase/auth';
-import {useState} from 'react';
+import {Eye, EyeOff} from 'lucide-react';
+import {useEffect, useState} from 'react';
+import {toast} from 'sonner';
 
 export default function SettingsPage() {
   const {user} = useAuthState();
-  const {toast} = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [reauthLoading, setReauthLoading] = useState(false);
   const [reauthDialogOpen, setReauthDialogOpen] = useState(false);
@@ -56,13 +59,35 @@ export default function SettingsPage() {
   const [pendingAction, setPendingAction] = useState<'email' | 'password' | null>(null);
 
   const [email, setEmail] = useState(user?.email || '');
-  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [weeklyDigest, setWeeklyDigest] = useState(true);
   const [applicationReminders, setApplicationReminders] = useState(true);
+
+  const [isSaving, setIsSaving] = useState(false);
+  const {preferences, updateNotifications, userType} = useUserStore();
+  const [notificationSettings, setNotificationSettings] = useState(preferences.notifications);
+
+  // Load user preferences from Firebase on component mount
+  useEffect(() => {
+    const loadPreferences = async () => {
+      if (user) {
+        try {
+          const prefs = await fetchUserPreferences();
+          if (prefs && prefs.notifications) {
+            setNotificationSettings(prefs.notifications);
+          }
+        } catch (error) {
+          console.error('Failed to load user preferences:', error);
+        }
+      }
+    };
+
+    loadPreferences();
+  }, [user]);
 
   const handleReauthenticate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,11 +113,7 @@ export default function SettingsPage() {
       }
     } catch (error: any) {
       setReauthError(error.message);
-      toast({
-        title: 'Authentication failed',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error('Authentication failed', {description: error.message});
     } finally {
       setReauthLoading(false);
     }
@@ -111,16 +132,9 @@ export default function SettingsPage() {
     setIsLoading(true);
     try {
       await updateEmail(user, email);
-      toast({
-        title: 'Email updated',
-        description: 'Your email has been updated successfully.',
-      });
+      toast.success('Email updated', {description: 'Your email has been updated successfully.'});
     } catch (error: any) {
-      toast({
-        title: 'Error updating email',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error('Error updating email', {description: error.message});
     } finally {
       setIsLoading(false);
       setPendingAction(null);
@@ -132,10 +146,8 @@ export default function SettingsPage() {
     if (!user) return;
 
     if (newPassword !== confirmPassword) {
-      toast({
-        title: "Passwords don't match",
+      toast.error("Passwords don't match", {
         description: 'New password and confirm password must match.',
-        variant: 'destructive',
       });
       return;
     }
@@ -149,19 +161,13 @@ export default function SettingsPage() {
     setIsLoading(true);
     try {
       await updatePassword(user, newPassword);
-      toast({
-        title: 'Password updated',
+      toast.success('Password updated', {
         description: 'Your password has been updated successfully.',
       });
-      setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: any) {
-      toast({
-        title: 'Error updating password',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.success('Error updating password', {description: error.message});
     } finally {
       setIsLoading(false);
       setPendingAction(null);
@@ -174,18 +180,36 @@ export default function SettingsPage() {
     setIsLoading(true);
     try {
       await deleteUser(user);
-      toast({
-        title: 'Account deleted',
+      toast.success('Account deleted', {
         description: 'Your account has been deleted successfully.',
       });
     } catch (error: any) {
-      toast({
-        title: 'Error deleting account',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error('Error deleting account', {description: error.message});
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleToggleNotification = (key: keyof typeof notificationSettings, value: boolean) => {
+    setNotificationSettings((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const saveNotificationPreferences = async () => {
+    setIsSaving(true);
+    try {
+      await updateNotifications(notificationSettings);
+      toast.success('Preferences saved', {
+        description: 'Your notification preferences have been updated.',
+      });
+    } catch (error: any) {
+      toast.error('Error saving preferences', {
+        description: error.message || 'Failed to save notification preferences',
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -211,13 +235,16 @@ export default function SettingsPage() {
             <form onSubmit={(e) => handleUpdateEmail(e)}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <FieldLabel htmlFor="email" required>
+                    Email
+                  </FieldLabel>
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    placeholder="Enter email address"
                   />
                 </div>
               </CardContent>
@@ -236,25 +263,43 @@ export default function SettingsPage() {
             </CardHeader>
             <form onSubmit={(e) => handleUpdatePassword(e)}>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="new-password">New Password</Label>
+                <div className="space-y-2 relative">
+                  <FieldLabel htmlFor="new-password" required>
+                    New Password
+                  </FieldLabel>
                   <Input
                     id="new-password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
+                    placeholder="Enter new password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-[27px] text-gray-500 hover:text-gray-700">
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <div className="space-y-2 relative">
+                  <FieldLabel htmlFor="confirm-password" required>
+                    Confirm New Password
+                  </FieldLabel>
                   <Input
                     id="confirm-password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
+                    placeholder="Confirm new password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-[27px] text-gray-500 hover:text-gray-700">
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </CardContent>
               <CardFooter>
@@ -318,39 +363,137 @@ export default function SettingsPage() {
                 </Label>
                 <Switch
                   id="email-notifications"
-                  checked={emailNotifications}
-                  onCheckedChange={setEmailNotifications}
+                  checked={notificationSettings.emailNotifications}
+                  onCheckedChange={(checked) =>
+                    handleToggleNotification('emailNotifications', checked)
+                  }
                 />
               </div>
+
               <div className="flex items-center justify-between space-x-2">
                 <Label htmlFor="weekly-digest" className="flex flex-col space-y-1">
                   <span>Weekly Digest</span>
                   <span className="font-normal text-sm text-muted-foreground">
-                    Receive a weekly summary of your job search progress
+                    {userType === 'jobSeeker'
+                      ? 'Receive a weekly summary of your job search progress'
+                      : 'Receive a weekly summary of your freelance projects and tasks'}
                   </span>
                 </Label>
                 <Switch
                   id="weekly-digest"
-                  checked={weeklyDigest}
-                  onCheckedChange={setWeeklyDigest}
+                  checked={notificationSettings.weeklyDigest}
+                  onCheckedChange={(checked) => handleToggleNotification('weeklyDigest', checked)}
                 />
               </div>
-              <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="application-reminders" className="flex flex-col space-y-1">
-                  <span>Application Reminders</span>
-                  <span className="font-normal text-sm text-muted-foreground">
-                    Get reminders for follow-ups and upcoming interviews
-                  </span>
-                </Label>
-                <Switch
-                  id="application-reminders"
-                  checked={applicationReminders}
-                  onCheckedChange={setApplicationReminders}
-                />
-              </div>
+
+              {userType === 'jobSeeker' && (
+                <>
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="application-reminders" className="flex flex-col space-y-1">
+                      <span>Application Reminders</span>
+                      <span className="font-normal text-sm text-muted-foreground">
+                        Get reminders for follow-ups and upcoming applications
+                      </span>
+                    </Label>
+                    <Switch
+                      id="application-reminders"
+                      checked={notificationSettings.applicationReminders}
+                      onCheckedChange={(checked) =>
+                        handleToggleNotification('applicationReminders', checked)
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="interview-reminders" className="flex flex-col space-y-1">
+                      <span>Interview Reminders</span>
+                      <span className="font-normal text-sm text-muted-foreground">
+                        Get reminders 24 hours before scheduled interviews
+                      </span>
+                    </Label>
+                    <Switch
+                      id="interview-reminders"
+                      checked={notificationSettings.interviewReminders}
+                      onCheckedChange={(checked) =>
+                        handleToggleNotification('interviewReminders', checked)
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="offer-deadline-reminders" className="flex flex-col space-y-1">
+                      <span>Offer Deadline Reminders</span>
+                      <span className="font-normal text-sm text-muted-foreground">
+                        Get reminders about upcoming job offer deadlines and start dates
+                      </span>
+                    </Label>
+                    <Switch
+                      id="offer-deadline-reminders"
+                      checked={notificationSettings.offerDeadlineReminders}
+                      onCheckedChange={(checked) =>
+                        handleToggleNotification('offerDeadlineReminders', checked)
+                      }
+                    />
+                  </div>
+                </>
+              )}
+
+              {userType === 'freelancer' && (
+                <>
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="deadline-reminders" className="flex flex-col space-y-1">
+                      <span>Deadline Reminders</span>
+                      <span className="font-normal text-sm text-muted-foreground">
+                        Get reminders for upcoming project and task deadlines
+                      </span>
+                    </Label>
+                    <Switch
+                      id="deadline-reminders"
+                      checked={notificationSettings.deadlineReminders}
+                      onCheckedChange={(checked) =>
+                        handleToggleNotification('deadlineReminders', checked)
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="client-updates" className="flex flex-col space-y-1">
+                      <span>Client Updates</span>
+                      <span className="font-normal text-sm text-muted-foreground">
+                        Receive notifications about client activity and updates
+                      </span>
+                    </Label>
+                    <Switch
+                      id="client-updates"
+                      checked={notificationSettings.clientUpdates}
+                      onCheckedChange={(checked) =>
+                        handleToggleNotification('clientUpdates', checked)
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="payment-reminders" className="flex flex-col space-y-1">
+                      <span>Payment Reminders</span>
+                      <span className="font-normal text-sm text-muted-foreground">
+                        Get reminders about upcoming and overdue payments
+                      </span>
+                    </Label>
+                    <Switch
+                      id="payment-reminders"
+                      checked={notificationSettings.paymentReminders}
+                      onCheckedChange={(checked) =>
+                        handleToggleNotification('paymentReminders', checked)
+                      }
+                    />
+                  </div>
+                </>
+              )}
             </CardContent>
             <CardFooter>
-              <Button>Save Preferences</Button>
+              <Button onClick={saveNotificationPreferences} disabled={isSaving}>
+                {isSaving ? 'Saving...' : 'Save Preferences'}
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -396,7 +539,9 @@ export default function SettingsPage() {
           <form onSubmit={handleReauthenticate}>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="current-password">Current Password</Label>
+                <FieldLabel htmlFor="current-password" required>
+                  Current Password
+                </FieldLabel>
                 <Input
                   id="current-password"
                   type="password"
