@@ -27,6 +27,7 @@ export interface Client {
   rate?: string;
   contactEmail?: string;
   contactPhone?: string;
+  sentDate: string;
   notes?: string;
   createdAt?: any;
 }

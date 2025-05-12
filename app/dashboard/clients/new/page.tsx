@@ -32,15 +32,36 @@ import * as yup from 'yup';
 // Schema
 const clientSchema = yup.object().shape({
   name: yup.string().required('Client name is required'),
-  company: yup.string().required(),
+  company: yup.string().required('Company name is required'),
   project: yup.string().required('Project name is required'),
   status: yup.string().required('Status is required'),
-  startDate: yup.string().required('Start date is required'),
-  endDate: yup.string().required(),
+  sentDate: yup.string().when('status', {
+    is: (status: string) => ['cold-pitch', 'proposal'].includes(status),
+    then: (schema) => schema.required('Sent date is required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  startDate: yup.string().when('status', {
+    is: (status: string) => ['active', 'delivered', 'completed', 'paid'].includes(status),
+    then: (schema) => schema.required('Start date is required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  endDate: yup.string().when('status', {
+    is: (status: string) => ['active', 'delivered', 'completed', 'paid'].includes(status),
+    then: (schema) => schema.required('End date is required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
   budget: yup.string().optional(),
   rate: yup.string().optional(),
-  contactEmail: yup.string().email('Invalid email').optional(),
-  contactPhone: yup.string().optional(),
+  contactEmail: yup.string().when('status', {
+    is: (status: string) => ['cold-pitch', 'proposal', 'active', 'negotiation'].includes(status),
+    then: (schema) => schema.email('Invalid email').required('Contact email is required'),
+    otherwise: (schema) => schema.email('Invalid email').optional(),
+  }),
+  contactPhone: yup.string().when('status', {
+    is: (status: string) => ['cold-pitch', 'proposal', 'active', 'negotiation'].includes(status),
+    then: (schema) => schema.required('Contact phone is required'),
+    otherwise: (schema) => schema.optional(),
+  }),
   notes: yup.string().optional(),
 });
 
@@ -54,6 +75,7 @@ export default function NewClientPage() {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: {errors},
   } = useForm<ClientFormData>({
     resolver: yupResolver(clientSchema),
@@ -62,7 +84,8 @@ export default function NewClientPage() {
       company: '',
       project: '',
       status: '',
-      startDate: new Date().toISOString().split('T')[0],
+      sentDate: '',
+      startDate: '',
       endDate: '',
       budget: '',
       rate: '',
@@ -71,6 +94,11 @@ export default function NewClientPage() {
       notes: '',
     },
   });
+
+  const status = watch('status');
+  const showSentDate = ['cold-pitch', 'proposal'].includes(status);
+  const showProjectDates = ['active', 'delivered', 'completed', 'paid'].includes(status);
+  const showContactFields = ['cold-pitch', 'proposal', 'active', 'negotiation'].includes(status);
 
   const mutation = useMutation({
     mutationFn: addClient,
@@ -89,7 +117,23 @@ export default function NewClientPage() {
   const onSubmit = (data: ClientFormData) => {
     mutation.mutate({
       ...data,
+      sentDate: data.sentDate || '',
+      startDate: data.startDate || '',
+      endDate: data.endDate || '',
+      budget: data.budget || '',
+      rate: data.rate || '',
+      contactEmail: data.contactEmail || '',
+      contactPhone: data.contactPhone || '',
+      notes: data.notes || '',
     });
+  };
+
+  const handleStatusChange = (value: string) => {
+    setValue('status', value);
+    // Clear dates when switching statuses
+    setValue('sentDate', '');
+    setValue('startDate', '');
+    setValue('endDate', '');
   };
 
   return (
@@ -140,17 +184,21 @@ export default function NewClientPage() {
                 <FieldLabel htmlFor="status" required>
                   Status
                 </FieldLabel>
-                <Select onValueChange={(value) => setValue('status', value)}>
+                <Select onValueChange={handleStatusChange} value={status}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="cold-pitch">Cold Pitch Sent</SelectItem>
+                    <SelectItem value="proposal">Proposal Sent</SelectItem>
+                    <SelectItem value="negotiation">In Negotiation</SelectItem>
                     <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="delivered">Delivered (Pending Payment)</SelectItem>
+                    <SelectItem value="on-hold">On Hold</SelectItem>
                     <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="pitched">Pitched</SelectItem>
-                    <SelectItem value="negotiating">Negotiating</SelectItem>
-                    <SelectItem value="on-hold">On Hold / Ignored</SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
                     <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="lost">Lost</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.status && <p className="text-red-500 text-sm">{errors.status.message}</p>}
@@ -161,37 +209,65 @@ export default function NewClientPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <FieldLabel htmlFor="startDate" required>
-                  Start Date
-                </FieldLabel>
-                <Input id="startDate" type="date" {...register('startDate')} />
-                {errors.startDate && (
-                  <p className="text-red-500 text-sm">{errors.startDate.message}</p>
-                )}
+            {showSentDate && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <FieldLabel htmlFor="sentDate" required>
+                    Sent Date
+                  </FieldLabel>
+                  <Input id="sentDate" type="date" {...register('sentDate')} />
+                  {errors.sentDate && (
+                    <p className="text-red-500 text-sm">{errors.sentDate.message}</p>
+                  )}
+                </div>
               </div>
-              <div className="space-y-2">
-                <FieldLabel htmlFor="endDate" required>
-                  End Date
-                </FieldLabel>
-                <Input id="endDate" type="date" {...register('endDate')} />
-              </div>
-            </div>
+            )}
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <FieldLabel htmlFor="contactEmail">Contact Email</FieldLabel>
-                <Input id="contactEmail" type="email" {...register('contactEmail')} />
-                {errors.contactEmail && (
-                  <p className="text-red-500 text-sm">{errors.contactEmail.message}</p>
-                )}
+            {showProjectDates && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <FieldLabel htmlFor="startDate" required>
+                    Start Date
+                  </FieldLabel>
+                  <Input id="startDate" type="date" {...register('startDate')} />
+                  {errors.startDate && (
+                    <p className="text-red-500 text-sm">{errors.startDate.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <FieldLabel htmlFor="endDate" required>
+                    End Date
+                  </FieldLabel>
+                  <Input id="endDate" type="date" {...register('endDate')} />
+                  {errors.endDate && (
+                    <p className="text-red-500 text-sm">{errors.endDate.message}</p>
+                  )}
+                </div>
               </div>
-              <div className="space-y-2">
-                <FieldLabel htmlFor="contactPhone">Contact Phone</FieldLabel>
-                <Input id="contactPhone" {...register('contactPhone')} />
+            )}
+
+            {showContactFields && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <FieldLabel htmlFor="contactEmail" required={showContactFields}>
+                    Contact Email
+                  </FieldLabel>
+                  <Input id="contactEmail" type="email" {...register('contactEmail')} />
+                  {errors.contactEmail && (
+                    <p className="text-red-500 text-sm">{errors.contactEmail.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <FieldLabel htmlFor="contactPhone" required={showContactFields}>
+                    Contact Phone
+                  </FieldLabel>
+                  <Input id="contactPhone" {...register('contactPhone')} />
+                  {errors.contactPhone && (
+                    <p className="text-red-500 text-sm">{errors.contactPhone.message}</p>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="space-y-2">
               <FieldLabel htmlFor="notes">Notes</FieldLabel>

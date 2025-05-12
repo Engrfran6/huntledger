@@ -142,13 +142,11 @@ export default function SignInPage() {
                 'Sign in'
               )}
             </Button>
-            <div className="flex flex-col md:flex-row items-center gap-2 md:justify-between w-full text-sm px-4">
+
+            <div className="flex flex-col md:flex-row items-center gap-2 md:justify-between w-full text-sm px-4 ">
               <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
-                <DialogTrigger>
-                  <Button
-                    asChild
-                    variant="link"
-                    className="text-orange-600 hover:underline p-0 h-auto">
+                <DialogTrigger asChild>
+                  <Button variant="link" className="text-orange-600 hover:underline p-0 h-auto">
                     Forgot password?
                   </Button>
                 </DialogTrigger>
