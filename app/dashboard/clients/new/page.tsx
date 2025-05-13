@@ -54,12 +54,12 @@ const clientSchema = yup.object().shape({
   rate: yup.string().optional(),
   contactEmail: yup.string().when('status', {
     is: (status: string) => ['cold-pitch', 'proposal', 'active', 'negotiation'].includes(status),
-    then: (schema) => schema.email('Invalid email').required('Contact email is required'),
+    then: (schema) => schema.email('Invalid email').optional(),
     otherwise: (schema) => schema.email('Invalid email').optional(),
   }),
   contactPhone: yup.string().when('status', {
     is: (status: string) => ['cold-pitch', 'proposal', 'active', 'negotiation'].includes(status),
-    then: (schema) => schema.required('Contact phone is required'),
+    then: (schema) => schema.optional(),
     otherwise: (schema) => schema.optional(),
   }),
   notes: yup.string().optional(),
@@ -249,18 +249,14 @@ export default function NewClientPage() {
             {showContactFields && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <FieldLabel htmlFor="contactEmail" required={showContactFields}>
-                    Contact Email
-                  </FieldLabel>
+                  <FieldLabel htmlFor="contactEmail">Contact Email</FieldLabel>
                   <Input id="contactEmail" type="email" {...register('contactEmail')} />
                   {errors.contactEmail && (
                     <p className="text-red-500 text-sm">{errors.contactEmail.message}</p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <FieldLabel htmlFor="contactPhone" required={showContactFields}>
-                    Contact Phone
-                  </FieldLabel>
+                  <FieldLabel htmlFor="contactPhone">Contact Phone</FieldLabel>
                   <Input id="contactPhone" {...register('contactPhone')} />
                   {errors.contactPhone && (
                     <p className="text-red-500 text-sm">{errors.contactPhone.message}</p>
