@@ -47,8 +47,9 @@ export function ClientsTable({clients}: ClientsTableProps) {
 
   const sortedClients = [...filteredClients].sort((a, b) => {
     if (sortField === 'startDate') {
-      const dateA = new Date(a.startDate).getTime();
-      const dateB = new Date(b.startDate).getTime();
+      // Handle cases where startDate might be missing
+      const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
+      const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
       return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
     }
 
@@ -71,8 +72,29 @@ export function ClientsTable({clients}: ClientsTableProps) {
         return 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800';
       case 'cancelled':
         return 'bg-red-100 hover:bg-red-200 text-red-800';
+      case 'cold-pitch':
+        return 'bg-purple-100 hover:bg-purple-200 text-purple-800';
+      case 'proposal':
+        return 'bg-indigo-100 hover:bg-indigo-200 text-indigo-800';
+      case 'negotiation':
+        return 'bg-cyan-100 hover:bg-cyan-200 text-cyan-800';
+      case 'delivered':
+        return 'bg-amber-100 hover:bg-amber-200 text-amber-800';
+      case 'paid':
+        return 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800';
+      case 'lost':
+        return 'bg-rose-100 hover:bg-rose-200 text-rose-800';
       default:
         return 'bg-gray-100 hover:bg-gray-200 text-gray-800';
+    }
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Not started';
+    try {
+      return formatDistanceToNow(new Date(dateString), {addSuffix: true});
+    } catch {
+      return 'Invalid date';
     }
   };
 
@@ -156,11 +178,14 @@ export function ClientsTable({clients}: ClientsTableProps) {
                   <TableCell>{client.project}</TableCell>
                   <TableCell className="hidden md:table-cell">
                     <Badge className={getStatusColor(client.status)} variant="outline">
-                      {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
+                      {client.status
+                        .split('-')
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')}
                     </Badge>
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {formatDistanceToNow(new Date(client.startDate), {addSuffix: true})}
+                    {formatDate(client.startDate)}
                   </TableCell>
                   <TableCell className="hidden lg:table-cell">{client.budget || 'N/A'}</TableCell>
                   <TableCell>
