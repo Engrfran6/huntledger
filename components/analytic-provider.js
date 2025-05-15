@@ -1,11 +1,11 @@
 'use client';
 
-import {analytics} from '@/lib/analytics';
 import {useEffect} from 'react';
+import {initializeAnalytics} from '../lib/analytics';
 
 export function AnalyticsProvider() {
   useEffect(() => {
-    console.log('Firebase Analytics Initialized:', analytics);
+    initializeAnalytics();
   }, []);
 
   return null;
