@@ -5,6 +5,7 @@ import {Button} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import {fetchJobs} from '@/lib/api';
 import {useJobsStore} from '@/lib/stores/jobs-store';
+import {Job} from '@/lib/types';
 import {useQuery} from '@tanstack/react-query';
 import {Plus} from 'lucide-react';
 import {useRouter} from 'next/navigation';
@@ -12,22 +13,24 @@ import {useEffect} from 'react';
 
 export default function ApplicationsPage() {
   const router = useRouter();
-  const {setJobs} = useJobsStore();
+  const {jobs, setJobs} = useJobsStore();
 
-  const {data: jobs, isLoading} = useQuery({
+  const {data: fetchedJobs, isLoading} = useQuery<Job[]>({
     queryKey: ['jobs'],
     queryFn: fetchJobs,
   });
 
   useEffect(() => {
-    if (jobs) {
-      setJobs(jobs);
+    if (fetchedJobs) {
+      setJobs(fetchedJobs);
     }
-  }, [jobs, setJobs]);
+  }, [fetchedJobs, setJobs]);
+
+  const displayJobs = jobs || fetchedJobs || [];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center justify-between px-2">
         <h1 className="text-2xl font-bold tracking-tight">Applications</h1>
         <Button
           onClick={() => router.push('/dashboard/jobs/new')}
@@ -37,7 +40,7 @@ export default function ApplicationsPage() {
       </div>
 
       <div className="rounded-lg border bg-card">
-        <div className="p-6">
+        <div className="py-6 px-2 md:px-6">
           <h2 className="text-xl font-semibold">All Job Applications</h2>
           <p className="text-sm text-muted-foreground">
             View and manage all your remote job applications.
@@ -48,7 +51,7 @@ export default function ApplicationsPage() {
             <Skeleton className="h-64 w-full" />
           </div>
         ) : (
-          <JobsTable jobs={jobs || []} />
+          <JobsTable jobs={displayJobs} />
         )}
       </div>
     </div>

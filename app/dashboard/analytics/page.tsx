@@ -36,7 +36,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center justify-between pl-2">
         <h1 className="text-2xl font-bold tracking-tight ">Analytics</h1>
       </div>
 
