@@ -11,7 +11,6 @@ import {
 import {Input} from '@/components/ui/input';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import type {Job} from '@/lib/types';
-import {useQueryClient} from '@tanstack/react-query';
 import {formatDistanceToNow} from 'date-fns';
 import {ChevronDown, ChevronUp, Edit, ExternalLink, MoreHorizontal} from 'lucide-react';
 import {useRouter} from 'next/navigation';
@@ -22,7 +21,6 @@ interface JobsTableProps {
 }
 
 export function JobsTable({jobs}: JobsTableProps) {
-  const queryClient = useQueryClient();
   const router = useRouter();
   const [sortField, setSortField] = useState<keyof Job>('appliedDate');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
@@ -123,7 +121,9 @@ export function JobsTable({jobs}: JobsTableProps) {
                     <ChevronDown className="ml-1 inline h-4 w-4" />
                   ))}
               </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => handleSort('status')}>
+              <TableHead
+                className="hidden md:table-cell cursor-pointer"
+                onClick={() => handleSort('status')}>
                 Status
                 {sortField === 'status' &&
                   (sortDirection === 'asc' ? (
@@ -159,10 +159,13 @@ export function JobsTable({jobs}: JobsTableProps) {
                   key={job.id}
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => router.push(`/dashboard/jobs/${job.id}`)}>
-                  <TableCell className="font-medium">{job.company}</TableCell>
+                  <TableCell className="font-medium max-w-[9rem]  truncate">
+                    {job.company}
+                  </TableCell>
                   <TableCell>{job.position}</TableCell>
                   <TableCell className="hidden md:table-cell">{job.location}</TableCell>
-                  <TableCell>
+
+                  <TableCell className="hidden md:table-cell">
                     <Badge className={getStatusColor(job.status)} variant="outline">
                       {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
                     </Badge>

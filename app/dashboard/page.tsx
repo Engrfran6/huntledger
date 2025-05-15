@@ -81,13 +81,13 @@ export default function DashboardPage() {
 
         {userType === 'jobSeeker' ? (
           <Card>
-            <CardHeader>
+            <CardHeader className="px-2 md:px-6">
               <CardTitle>Recent Job Applications</CardTitle>
               <CardDescription>
                 Track and manage your recent job applications. Click on a job to view details.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-0 md:px-6">
               <JobsTable jobs={jobs.slice(0, 5)} />
               {jobs.length > 5 && (
                 <div className="mt-4 text-center">
@@ -113,13 +113,13 @@ export default function DashboardPage() {
           </Card>
         ) : (
           <Card>
-            <CardHeader>
+            <CardHeader className="px-2 md:px-6">
               <CardTitle>Recent Clients</CardTitle>
               <CardDescription>
                 View and manage your recent clients. Click on a client to view details.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-0 md:px-6">
               <ClientsTable clients={clients.slice(0, 5)} />
               {clients.length > 5 && (
                 <div className="mt-4 text-center">
