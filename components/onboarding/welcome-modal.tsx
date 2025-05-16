@@ -178,8 +178,8 @@ export function WelcomeModal({userType, onClose}: WelcomeModalProps) {
                 <p className="mb-2">With HuntLedger's Freelancer tools, you can:</p>
                 <ul className="space-y-2 list-disc pl-5 mb-4">
                   <li>Track clients and their projects</li>
-                  <li>Manage subcontractors for your projects</li>
-                  <li>Assign and monitor tasks</li>
+                  {/* <li>Manage subcontractors for your projects</li> */}
+                  {/* <li>Assign and monitor tasks</li> */}
                   <li>Track project timelines and budgets</li>
                 </ul>
                 <p className="text-sm text-muted-foreground">
@@ -202,7 +202,7 @@ export function WelcomeModal({userType, onClose}: WelcomeModalProps) {
                       Monitor project progress, timelines, and budgets.
                     </p>
                   </div>
-                  <div className="border rounded-lg p-4">
+                  {/* <div className="border rounded-lg p-4">
                     <h3 className="font-medium mb-2">Task Assignment</h3>
                     <p className="text-sm text-muted-foreground">
                       Create and assign tasks to yourself or subcontractors.
@@ -213,7 +213,7 @@ export function WelcomeModal({userType, onClose}: WelcomeModalProps) {
                     <p className="text-sm text-muted-foreground">
                       Manage your team of subcontractors and their assignments.
                     </p>
-                  </div>
+                  </div> */}
                 </div>
               </TabsContent>
 

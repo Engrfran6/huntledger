@@ -179,24 +179,44 @@ export default function DashboardPage() {
                 ) : (
                   <div className="grid gap-4 md:grid-cols-3">
                     <div className="rounded-lg border bg-card p-4">
-                      <h3 className="font-medium mb-2">1. Add Clients</h3>
+                      <h3 className="font-medium mb-2">1. Client Setup</h3>
                       <p className="text-sm text-muted-foreground">
-                        Start by adding your clients and their contact information.
+                        Add client details and communication preferences for easy management.
                       </p>
                     </div>
                     <div className="rounded-lg border bg-card p-4">
-                      <h3 className="font-medium mb-2">2. Create Projects</h3>
+                      <h3 className="font-medium mb-2">2. Deliverables Tracking</h3>
                       <p className="text-sm text-muted-foreground">
-                        Set up projects with timelines, budgets, and descriptions.
+                        Define and monitor key project deliverables with deadlines.
                       </p>
                     </div>
                     <div className="rounded-lg border bg-card p-4">
-                      <h3 className="font-medium mb-2">3. Manage Tasks</h3>
+                      <h3 className="font-medium mb-2">3. Contract Management</h3>
                       <p className="text-sm text-muted-foreground">
-                        Break down projects into tasks and track their progress.
+                        Track contract terms, timelines, and renewal dates.
                       </p>
                     </div>
                   </div>
+                  // <div className="grid gap-4 md:grid-cols-3">
+                  //   <div className="rounded-lg border bg-card p-4">
+                  //     <h3 className="font-medium mb-2">1. Add Clients</h3>
+                  //     <p className="text-sm text-muted-foreground">
+                  //       Start by adding your clients and their contact information.
+                  //     </p>
+                  //   </div>
+                  //   <div className="rounded-lg border bg-card p-4">
+                  //     <h3 className="font-medium mb-2">2. Create Projects</h3>
+                  //     <p className="text-sm text-muted-foreground">
+                  //       Set up projects with timelines, budgets, and descriptions.
+                  //     </p>
+                  //   </div>
+                  //   <div className="rounded-lg border bg-card p-4">
+                  //     <h3 className="font-medium mb-2">3. Manage Tasks</h3>
+                  //     <p className="text-sm text-muted-foreground">
+                  //       Break down projects into tasks and track their progress.
+                  //     </p>
+                  //   </div>
+                  // </div>
                 )}
                 <div className="flex justify-center mt-4">
                   <Button variant="outline" onClick={() => setShowWelcomeModal(true)}>

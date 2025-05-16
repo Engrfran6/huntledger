@@ -9,6 +9,7 @@ import {
   Megaphone,
   Pause,
   RefreshCw,
+  Target,
   TrendingUp,
   UserPlus,
   XCircle,
@@ -229,6 +230,7 @@ function FreelancerStats({clients}: {clients: Client[]}) {
     onHold: clients.filter((c) => c.status === 'on-hold').length,
     cancelled: clients.filter((c) => c.status === 'cancelled').length,
     lost: clients.filter((c) => c.status === 'lost').length,
+    targeting: clients.filter((c) => c.status === 'targeting').length,
   };
 
   // Pipeline metrics
@@ -336,6 +338,14 @@ function FreelancerStats({clients}: {clients: Client[]}) {
       description: 'Pitch to paid conversion',
       color: 'text-teal-600',
       bgColor: 'bg-teal-100',
+    },
+    {
+      title: 'Targeting',
+      value: statusCounts.targeting,
+      icon: Target,
+      description: `${statusCounts.targeting} potential clients in outreach phase`,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-100',
     },
   ];
 

@@ -109,7 +109,9 @@ export default function ChooseModePage() {
     <div className="flex min-h-screen flex-col items-center bg-gray-50 dark:bg-gray-900 px-4 pb-24 md:pb-4 relative">
       <div className="md:mt-[10%] h-full justify-center w-full max-w-4xl flex flex-col items-center py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Welcome to HuntLedger</h1>
+          <h1 className="text-3xl font-bold tracking-tight ">
+            Welcome to Hunt<span className="text-orange-600">Led</span>ger
+          </h1>
           <p className="text-muted-foreground mt-2">Choose how you want to use HuntLedger today</p>
         </div>
 
@@ -164,11 +166,11 @@ export default function ChooseModePage() {
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
               <ul className="space-y-2 list-disc pl-5">
-                <li>Track client projects</li>
-                <li>Manage subcontractors</li>
-                <li>Assign and monitor tasks</li>
-                <li>Track project timelines</li>
-                <li>Analyze revenue and performance</li>
+                <li>Manage client communications</li>
+                <li>Track project deliverables</li>
+                <li>Monitor contract timelines</li>
+                <li>Organize important documents</li>
+                <li>Analyze project profitability</li>
               </ul>
             </CardContent>
             <CardFooter>
@@ -189,7 +191,9 @@ export default function ChooseModePage() {
             checked={rememberChoice}
             onCheckedChange={(checked) => setRememberChoice(checked as boolean)}
           />
-          <Label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer">
+          <Label
+            htmlFor="remember"
+            className="text-sm underline underline-offset-4 decoration-orange-500 text-muted-foreground cursor-pointer">
             Remember my choice for next time
           </Label>
         </div>
@@ -201,7 +205,9 @@ export default function ChooseModePage() {
               checked={rememberChoice}
               onCheckedChange={(checked) => setRememberChoice(checked as boolean)}
             />
-            <Label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer">
+            <Label
+              htmlFor="remember"
+              className="text-sm underline underline-offset-4 decoration-orange-500 text-muted-foreground cursor-pointer">
               Remember my choice for next time
             </Label>
           </div>
