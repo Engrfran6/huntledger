@@ -181,6 +181,21 @@ export default function SignUpPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
+            <p className="text-xs text-muted-foreground mt-4">
+              By registering, you agree to our{' '}
+              <Link href="/terms" className="underline hover:text-primary">
+                Terms
+              </Link>
+              ,{' '}
+              <Link href="/privacy" className="underline hover:text-primary">
+                Privacy Policy
+              </Link>
+              , and{' '}
+              <Link href="/dpa" className="underline hover:text-primary">
+                DPA
+              </Link>
+              .
+            </p>
             <Button
               type="submit"
               className="w-full bg-orange-600 hover:bg-orange-700"

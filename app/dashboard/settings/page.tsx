@@ -33,11 +33,13 @@ import {
 } from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
+import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {Switch} from '@/components/ui/switch';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {fetchUserPreferences} from '@/lib/api';
 import {useAuthState} from '@/lib/auth-hooks';
 import {useUserStore} from '@/lib/stores/user-store';
+import {LaptopIcon, MoonIcon, SunIcon} from '@phosphor-icons/react/dist/ssr';
 import {
   deleteUser,
   EmailAuthProvider,
@@ -46,6 +48,7 @@ import {
   updatePassword,
 } from 'firebase/auth';
 import {Eye, EyeOff} from 'lucide-react';
+import Link from 'next/link';
 import {useEffect, useState} from 'react';
 import {toast} from 'sonner';
 
@@ -68,8 +71,9 @@ export default function SettingsPage() {
   const [applicationReminders, setApplicationReminders] = useState(true);
 
   const [isSaving, setIsSaving] = useState(false);
-  const {preferences, updateNotifications, userType} = useUserStore();
+  const {preferences, updatePreferences, updateNotifications, userType} = useUserStore();
   const [notificationSettings, setNotificationSettings] = useState(preferences.notifications);
+  const [theme, setTheme] = useState(preferences.theme || 'system');
 
   // Load user preferences from Firebase on component mount
   useEffect(() => {
@@ -213,6 +217,51 @@ export default function SettingsPage() {
     }
   };
 
+  const handleThemeChange = (value: string) => {
+    setTheme(value);
+    // Apply theme immediately (optional)
+    document.documentElement.setAttribute('data-theme', value);
+  };
+
+  const saveAppearancePreferences = async () => {
+    setIsSaving(true);
+    try {
+      await updatePreferences({...preferences, theme});
+      toast.success('Appearance saved', {
+        description: 'Your theme preferences have been updated.',
+      });
+    } catch (error: any) {
+      toast.error('Error saving preferences', {
+        description: error.message || 'Failed to save appearance preferences',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    const loadPreferences = async () => {
+      if (user) {
+        try {
+          const prefs = await fetchUserPreferences();
+          if (prefs) {
+            if (prefs.notifications) {
+              setNotificationSettings(prefs.notifications);
+            }
+            if (prefs.theme) {
+              setTheme(prefs.theme);
+              document.documentElement.setAttribute('data-theme', prefs.theme);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to load user preferences:', error);
+        }
+      }
+    };
+
+    loadPreferences();
+  }, [user]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between pl-2">
@@ -224,8 +273,8 @@ export default function SettingsPage() {
           <TabsTrigger value="account">Account</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger value="legal">Legal</TabsTrigger>
         </TabsList>
-
         <TabsContent value="account" className="space-y-6">
           <Card>
             <CardHeader>
@@ -346,7 +395,6 @@ export default function SettingsPage() {
             </CardFooter>
           </Card>
         </TabsContent>
-
         <TabsContent value="notifications" className="space-y-6">
           <Card>
             <CardHeader>
@@ -497,8 +545,7 @@ export default function SettingsPage() {
             </CardFooter>
           </Card>
         </TabsContent>
-
-        <TabsContent value="appearance" className="space-y-6">
+        {/* <TabsContent value="appearance" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Appearance</CardTitle>
@@ -523,6 +570,81 @@ export default function SettingsPage() {
             <CardFooter>
               <Button>Save Preferences</Button>
             </CardFooter>
+          </Card>
+        </TabsContent> */}
+        <TabsContent value="appearance" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Appearance</CardTitle>
+              <CardDescription>Customize the look and feel of the application</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Theme</Label>
+                <RadioGroup
+                  value={theme}
+                  onValueChange={handleThemeChange}
+                  className="grid grid-cols-3 gap-4">
+                  <div>
+                    <RadioGroupItem value="light" id="light" className="peer sr-only" />
+                    <Label
+                      htmlFor="light"
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                      <SunIcon className="mb-2 h-6 w-6" />
+                      Light
+                    </Label>
+                  </div>
+                  <div>
+                    <RadioGroupItem value="dark" id="dark" className="peer sr-only" />
+                    <Label
+                      htmlFor="dark"
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                      <MoonIcon className="mb-2 h-6 w-6" />
+                      Dark
+                    </Label>
+                  </div>
+                  <div>
+                    <RadioGroupItem value="system" id="system" className="peer sr-only" />
+                    <Label
+                      htmlFor="system"
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                      <LaptopIcon className="mb-2 h-6 w-6" />
+                      System
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={saveAppearancePreferences} disabled={isSaving}>
+                {isSaving ? 'Saving...' : 'Save Preferences'}
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="legal" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Legal Documents</CardTitle>
+              <CardDescription>Review our legal terms and policies</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <h3 className="font-medium">Legal Documents</h3>
+                <div className="flex flex-col space-y-2">
+                  <Link href="/terms" className="text-sm underline">
+                    Terms of Service
+                  </Link>
+                  <Link href="/privacy" className="text-sm underline">
+                    Privacy Policy
+                  </Link>
+                  <Link href="/dpa" className="text-sm underline">
+                    Data Processing Agreement
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
