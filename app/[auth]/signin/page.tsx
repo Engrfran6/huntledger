@@ -87,7 +87,7 @@ export default function SignInPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Sign in</CardTitle>
+          <CardTitle className="text-2xl text-center">Sign In</CardTitle>
           <CardDescription className="text-center">
             Enter your email and password to access your account
           </CardDescription>
@@ -111,21 +111,25 @@ export default function SignInPage() {
               <FieldLabel htmlFor="password" required>
                 Password
               </FieldLabel>
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                {...register('password')}
-                className="pr-10"
-                disabled={loading || isSubmitting}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  {...register('password')}
+                  className="pr-10"
+                  disabled={loading || isSubmitting}
+                />
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute hover:bg-transparent right-0 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                  {showPassword ? <EyeOff className="h-8 w-8" /> : <Eye className="h-8 w-8" />}
+                </Button>
+              </div>
               {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
-
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700">
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">

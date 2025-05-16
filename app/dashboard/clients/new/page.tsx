@@ -191,6 +191,7 @@ export default function NewClientPage() {
                   <SelectContent>
                     <SelectItem value="cold-pitch">Cold Pitch Sent</SelectItem>
                     <SelectItem value="proposal">Proposal Sent</SelectItem>
+                    <SelectItem value="targeting">Targeting</SelectItem>
                     <SelectItem value="negotiation">In Negotiation</SelectItem>
                     <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="delivered">Delivered (Pending Payment)</SelectItem>

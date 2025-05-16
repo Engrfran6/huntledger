@@ -66,7 +66,7 @@ export default function SignUpPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Create an account</CardTitle>
+          <CardTitle className="text-2xl text-center">Sign Up</CardTitle>
           <CardDescription className="text-center">
             Enter your email below to create your account
           </CardDescription>
@@ -74,7 +74,9 @@ export default function SignUpPage() {
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <FieldLabel htmlFor="email" required>
+                Email
+              </FieldLabel>
               <Input
                 id="email"
                 type="email"
@@ -85,7 +87,9 @@ export default function SignUpPage() {
               {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
             </div>
             <div className="space-y-2 relative">
-              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <FieldLabel htmlFor="password" required>
+                Password
+              </FieldLabel>
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
@@ -94,13 +98,15 @@ export default function SignUpPage() {
                 disabled={isSubmitting}
               />
               {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
-
-              <button
+              <Button
                 type="button"
+                size="icon"
+                variant="ghost"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700">
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+                className="absolute hover:bg-transparent right-0 top-[55%] transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </Button>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">

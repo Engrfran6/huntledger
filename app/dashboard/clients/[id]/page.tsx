@@ -315,6 +315,7 @@ export default function EditClientPage() {
                           <SelectItem value="cold-pitch">Cold Pitch Sent</SelectItem>
                           <SelectItem value="proposal">Proposal Sent</SelectItem>
                           <SelectItem value="negotiation">In Negotiation</SelectItem>
+                          <SelectItem value="targeting">Targeting</SelectItem>
                           <SelectItem value="active">Active</SelectItem>
                           <SelectItem value="delivered">Delivered (Pending Payment)</SelectItem>
                           <SelectItem value="on-hold">On Hold</SelectItem>
