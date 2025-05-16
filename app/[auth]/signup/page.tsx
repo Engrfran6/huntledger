@@ -1,5 +1,9 @@
 'use client';
 
+import {signInWithGitHub, signInWithGoogle} from '@/lib/auth-provider';
+import {GithubLogoIcon, GoogleLogoIcon} from '@phosphor-icons/react/dist/ssr';
+import {Eye, EyeOff} from 'lucide-react';
+
 import {yupResolver} from '@hookform/resolvers/yup';
 import {useForm} from 'react-hook-form';
 import * as yup from 'yup';
@@ -18,9 +22,10 @@ import {
 import {Input} from '@/components/ui/input';
 
 import {FieldLabel} from '@/components/dashboard/shared/custom-label';
+import {fetchUserPreferences} from '@/lib/api';
 import {useSignUp} from '@/lib/auth-hooks';
 import {useUserStore} from '@/lib/stores/user-store';
-import {Eye, EyeOff} from 'lucide-react';
+import {useRouter} from 'next/navigation';
 import {useState} from 'react';
 import {toast} from 'sonner';
 
@@ -62,6 +67,50 @@ export default function SignUpPage() {
     }
   };
 
+  const {updatePreferences, preferences} = useUserStore();
+  const router = useRouter();
+  const handleGoogleSignUp = async () => {
+    try {
+      const success = await signInWithGoogle();
+      toast.success('Signed in with Google');
+
+      if (success) {
+        // Fetch user preferences from database
+        const userPrefs = await fetchUserPreferences();
+
+        // Update local preferences with database values
+        if (userPrefs) {
+          updatePreferences(userPrefs);
+        }
+
+        router.push('/choose-mode');
+      }
+    } catch (error: any) {
+      toast.error('Google sign-in failed', {description: error.message});
+    }
+  };
+
+  const handleGitHubSignUp = async () => {
+    try {
+      const success = await signInWithGitHub();
+      toast.success('Signed in with GitHub');
+
+      if (success) {
+        // Fetch user preferences from database
+        const userPrefs = await fetchUserPreferences();
+
+        // Update local preferences with database values
+        if (userPrefs) {
+          updatePreferences(userPrefs);
+        }
+
+        router.push('/choose-mode');
+      }
+    } catch (error: any) {
+      toast.error('GitHub sign-in failed', {description: error.message});
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
       <Card className="w-full max-w-md">
@@ -71,6 +120,28 @@ export default function SignUpPage() {
             Enter your email below to create your account
           </CardDescription>
         </CardHeader>
+        <div className="px-6 pb-4 space-y-3">
+          <Button variant="outline" className="w-full gap-2" onClick={handleGoogleSignUp}>
+            <GoogleLogoIcon className="h-4 w-4" />
+            Continue with Google
+          </Button>
+          <Button variant="outline" className="w-full gap-2" onClick={handleGitHubSignUp}>
+            <GithubLogoIcon className="h-4 w-4" />
+            Continue with GitHub
+          </Button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or sign up with email
+              </span>
+            </div>
+          </div>
+        </div>
+
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <CardContent className="space-y-4">
             <div className="space-y-2">

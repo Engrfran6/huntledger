@@ -83,15 +83,26 @@ export function useSignUp() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const {updatePreferences, preferences} = useUserStore();
 
   const signUp = async (email: string, password: string) => {
     setError(null);
     setLoading(true);
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const success = await createUserWithEmailAndPassword(auth, email, password);
 
-      router.push('/choose-mode');
+      if (success) {
+        // Fetch user preferences from database
+        const userPrefs = await fetchUserPreferences();
+
+        // Update local preferences with database values
+        if (userPrefs) {
+          updatePreferences(userPrefs);
+        }
+
+        router.push('/choose-mode');
+      }
 
       return true;
     } catch (err: any) {
