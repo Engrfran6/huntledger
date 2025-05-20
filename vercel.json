@@ -2,7 +2,10 @@
   "crons": [
     {
       "path": "/api/process-reminders",
-      "schedule": "0 8 * * *"
+      "schedule": "0 9 * * *",
+      "headers": {
+        "Authorization": "bd9bfc2e1d72ea3a2880bcfadde33a43d9c1db46c3779ecea9f72b3ea37a6441"
+      }
     }
   ]
 }

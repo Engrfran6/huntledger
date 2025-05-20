@@ -1,52 +1,5 @@
-// import sgMail from '@sendgrid/mail';
-// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
 import type {Client, Job, Task} from '@/lib/types';
-
-interface EmailData {
-  to: string;
-  subject: string;
-  html: string;
-  from?: string;
-}
-
-async function sendEmail(emailData: EmailData): Promise<boolean> {
-  try {
-    // This is where you would integrate with your email service
-    // Example with SendGrid:
-    // const msg = {
-    //   to: emailData.to,
-    //   from: emailData.from || 'notifications@yourapp.com',
-    //   subject: emailData.subject,
-    //   html: emailData.html,
-    // };
-    // await sgMail.send(msg);
-
-    // async function sendEmail(emailData) {
-    //   const msg = {
-    //     to: emailData.to,
-    //     from: emailData.from || 'notifications@yourapp.com',
-    //     subject: emailData.subject,
-    //     html: emailData.html,
-    //   };
-    //   await sgMail.send(msg);
-    //   return true;
-    // }
-
-    // For now, we'll just log the email for development
-    console.log('SENDING EMAIL:', {
-      to: emailData.to,
-      subject: emailData.subject,
-      // Truncate HTML for logging
-      html: emailData.html.substring(0, 100) + '...',
-    });
-
-    return true;
-  } catch (error) {
-    console.error('Error sending email:', error);
-    return false;
-  }
-}
+import {sendEmail} from './brevo';
 
 // Send an interview reminder
 export async function sendInterviewReminder(

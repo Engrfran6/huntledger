@@ -2,12 +2,10 @@ import {processAllReminders} from '@/lib/reminders/reminder-service';
 import type {NextApiRequest, NextApiResponse} from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({error: 'Method not allowed'});
   }
 
-  // Verify the request has the correct secret token
   const secretToken = process.env.CRON_SECRET_TOKEN;
   const authHeader = req.headers.authorization;
 
@@ -19,7 +17,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Process all reminders
     const results = await processAllReminders();
 
-    // Return the results
     return res.status(200).json({
       success: true,
       processed: {

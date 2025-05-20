@@ -9,6 +9,20 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
+  async rewrites() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: process.env.DASHBOARD_URL || 'dashboard.localhost:3000',
+          },
+        ],
+        destination: '/dashboard/:path*',
+      },
+    ];
+  },
+};
 
-export default nextConfig
+export default nextConfig;

@@ -10,6 +10,7 @@ interface UserState {
   updatePreferences: (prefs: Partial<UserPreferences>) => void;
   updateNotifications: (notifications: NotificationPreferences) => Promise<boolean>;
   resetPreferences: () => void;
+  resetNotifications: () => Promise<boolean>;
 }
 
 const defaultNotifications: NotificationPreferences = {
@@ -74,6 +75,23 @@ export const useUserStore = create<UserState>()(
           return false;
         }
       },
+      resetNotifications: async () => {
+        try {
+          set((state) => ({
+            preferences: {
+              ...state.preferences,
+              notifications: defaultNotifications,
+            },
+          }));
+
+          await updateNotificationPreferences(defaultNotifications);
+          return true;
+        } catch (error) {
+          console.error('Failed to reset notification preferences:', error);
+          return false;
+        }
+      },
+
       resetPreferences: () =>
         set({
           userType: 'jobSeeker',

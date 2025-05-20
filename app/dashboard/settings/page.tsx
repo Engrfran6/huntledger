@@ -38,6 +38,7 @@ import {Switch} from '@/components/ui/switch';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {fetchUserPreferences} from '@/lib/api';
 import {useAuthState} from '@/lib/auth-hooks';
+
 import {useUserStore} from '@/lib/stores/user-store';
 import {LaptopIcon, MoonIcon, SunIcon} from '@phosphor-icons/react/dist/ssr';
 import {
@@ -66,12 +67,9 @@ export default function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [weeklyDigest, setWeeklyDigest] = useState(true);
-  const [applicationReminders, setApplicationReminders] = useState(true);
-
   const [isSaving, setIsSaving] = useState(false);
-  const {preferences, updatePreferences, updateNotifications, userType} = useUserStore();
+  const {preferences, resetNotifications, updatePreferences, updateNotifications, userType} =
+    useUserStore();
   const [notificationSettings, setNotificationSettings] = useState(preferences.notifications);
   const [theme, setTheme] = useState(preferences.theme || 'system');
 
@@ -214,6 +212,19 @@ export default function SettingsPage() {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleResetNotifications = async () => {
+    try {
+      await resetNotifications();
+      toast.success('Reverted to default', {
+        description: 'Your notification preferences have been updated to default.',
+      });
+    } catch (error: any) {
+      toast.error('Error resetting notification preferences', {
+        description: error.message || 'Failed to reset notification preferences',
+      });
     }
   };
 
@@ -538,40 +549,16 @@ export default function SettingsPage() {
                 </>
               )}
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex gap-4">
               <Button onClick={saveNotificationPreferences} disabled={isSaving}>
                 {isSaving ? 'Saving...' : 'Save Preferences'}
+              </Button>
+              <Button onClick={handleResetNotifications} variant="outline">
+                Reset{' '}
               </Button>
             </CardFooter>
           </Card>
         </TabsContent>
-        {/* <TabsContent value="appearance" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-              <CardDescription>Customize the look and feel of the application</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Theme</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  <Button variant="outline" className="justify-start">
-                    Light
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    Dark
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    System
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button>Save Preferences</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent> */}
         <TabsContent value="appearance" className="space-y-6">
           <Card>
             <CardHeader>
