@@ -1,0 +1,12 @@
+name: Trigger Reminders
+on:
+  schedule:
+    - cron: '0 6 * * *'
+jobs:
+  call-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Reminder API
+        run: |
+          curl -X POST "https://huntledgger.com/api/process-reminders" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET_TOKEN }}"
