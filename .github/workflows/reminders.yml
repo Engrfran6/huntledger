@@ -1,13 +1,26 @@
-name: Trigger Reminders
+name: Process Reminders
 on:
   schedule:
-    - cron: '0 10 * * *' # 7 AM UTC = 8 AM Nigeria Time (WAT)
+    - cron: '0 12 * * *' # 8 AM Nigeria Time
+  workflow_dispatch:
+
 jobs:
-  call-api:
+  process-reminders:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Reminder API
+      - name: Execute Reminders
+        env:
+          CRON_TOKEN: ${{ secrets.CRON_SECRET_TOKEN }}
         run: |
-          curl -X POST "https://www.huntledger.com/api/process-reminders" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET_TOKEN }}" \
-            -H "Content-Type: application/json"
+          RESPONSE=$(curl -s -X POST \
+            "https://www.huntledger.com/api/process-reminders" \
+            -H "Authorization: Bearer $CRON_TOKEN" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: GitHub-Actions-Webhook" \
+            -w "\nHTTP_STATUS: %{http_code}")
+
+          echo "$RESPONSE"
+          if ! echo "$RESPONSE" | grep -q '"success":true'; then
+            echo "::error::Reminder processing failed"
+            exit 1
+          fi
