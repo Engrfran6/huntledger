@@ -8,6 +8,6 @@ jobs:
     steps:
       - name: Trigger Reminder API
         run: |
-          curl -X POST "https://huntledger.com/api/process-reminders" \
+          curl -X POST "https://www.huntledger.com/api/process-reminders" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET_TOKEN }}" \
             -H "Content-Type: application/json"
