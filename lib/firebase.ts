@@ -11,11 +11,9 @@ export const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize with security settings
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Critical security settings
 auth.useDeviceLanguage();
 setPersistence(auth, browserSessionPersistence);
 
