@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     'application status tracker',
     'career progress monitor',
   ],
-  authors: [{name: 'HuntLedger Team', url: 'https://www.huntledger.com'}],
-  creator: 'HuntLedger',
-  publisher: 'HuntLedger',
+  authors: [{name: 'Francis Okpoluaefe', url: 'https://deulo.vercel.app'}],
+  creator: 'Francis Okpoluaefe',
+  publisher: 'Francis U. Okpoluaefe',
   formatDetection: {
     email: true,
     address: false,
@@ -82,6 +82,7 @@ export const metadata: Metadata = {
     creator: '@huntledger',
     images: ['https://www.huntledger.com/twitter-card.png'],
   },
+
   robots: {
     index: true,
     follow: true,
@@ -99,18 +100,19 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'WebPage',
-  name: 'HuntLedger - Job Application Tracker',
-  description: 'Organize and track your remote job applications',
+  '@type': 'Organization',
+  name: 'HuntLedger',
   url: 'https://www.huntledger.com',
-  publisher: {
-    '@type': 'Organization',
-    name: 'HuntLedger',
-    logo: {
-      '@type': 'ImageObject',
-      url: 'https://www.huntledger.com/logo.png',
-    },
+  logo: {
+    '@type': 'ImageObject',
+    url: 'https://www.huntledger.com/knowledge_panel_logo.png',
   },
+  description: 'Organize and track your remote job applications',
+  sameAs: [
+    'https://twitter.com/huntledger',
+    'https://github.com/engrfran6/huntledger',
+    'https://linkedin.com/company/huntledger',
+  ],
 };
 
 export default function RootLayout({
