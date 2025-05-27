@@ -1,88 +1,49 @@
 import type {Job} from '@/lib/types';
-import {format} from 'date-fns';
-import type React from 'react';
+import {sendEmail} from '../brevo';
 
-interface OfferReminderProps {
-  job: Job;
-  userName: string;
-}
+export async function sendOfferReminder(job: Job, email: string, name: string): Promise<boolean> {
+  const startDate = new Date(job.startDate!);
+  const formattedDate = startDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
-export const OfferReminderTemplate: React.FC<OfferReminderProps> = ({job, userName}) => {
-  const startDate = job.startDate ? new Date(job.startDate) : null;
-  const formattedDate = startDate ? format(startDate, 'EEEE, MMMM d, yyyy') : 'Not specified';
-
-  return (
-    <div>
-      <h1>Job Start Date Reminder</h1>
-      <p>Hello {userName},</p>
-      <p>
-        This is a reminder that your start date for the <strong>{job.position}</strong> position at{' '}
-        <strong>{job.company}</strong> is tomorrow.
-      </p>
-      <div
-        style={{margin: '20px 0', padding: '15px', border: '1px solid #ddd', borderRadius: '5px'}}>
-        <h2>Job Details</h2>
-        <p>
-          <strong>Company:</strong> {job.company}
-        </p>
-        <p>
-          <strong>Position:</strong> {job.position}
-        </p>
-        <p>
-          <strong>Start Date:</strong> {formattedDate}
-        </p>
-        {job.location && (
-          <p>
-            <strong>Location:</strong> {job.location}
-          </p>
-        )}
-      </div>
-      <p>Congratulations on your new position!</p>
-      <p>
-        <em>
-          You're receiving this email because you've enabled offer deadline reminders in your
-          notification settings. You can update your preferences in the settings page of your
-          account.
-        </em>
-      </p>
-    </div>
-  );
-};
-
-export function renderOfferReminderEmail(job: Job, userName: string): string {
-  // In a real implementation, you would use a library like React DOM Server
-  // to render this component to an HTML string
-  const startDate = job.startDate ? new Date(job.startDate) : null;
-  const formattedDate = startDate ? format(startDate, 'EEEE, MMMM d, yyyy') : 'Not specified';
-
-  return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background-color: #f97316; color: white; padding: 20px; text-align: center;">
-        <h1 style="margin: 0;">Job Start Date Reminder</h1>
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+      <div style="background-color: #ff6b35; padding: 15px; border-radius: 5px 5px 0 0;">
+        <h1 style="color: white; margin: 0;">Job Start Date Reminder</h1>
       </div>
       <div style="padding: 20px;">
-        <p>Hello ${userName},</p>
-        <p>
-          This is a reminder that your start date for the <strong>${
-            job.position
-          }</strong> position at
-          <strong>${job.company}</strong> is tomorrow.
-        </p>
-        <div style="margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
-          <h2 style="color: #f97316; margin-top: 0;">Job Details</h2>
+        <p>Hello ${name},</p>
+        <p>This is a friendly reminder that your new job starts tomorrow:</p>
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 15px 0;">
           <p><strong>Company:</strong> ${job.company}</p>
           <p><strong>Position:</strong> ${job.position}</p>
           <p><strong>Start Date:</strong> ${formattedDate}</p>
           ${job.location ? `<p><strong>Location:</strong> ${job.location}</p>` : ''}
         </div>
-        <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee;">
-          <p>Congratulations on your new position!</p>
-          <p style="font-size: 12px; color: #666;">
-            You're receiving this email because you've enabled offer deadline reminders in your notification settings. 
-            You can update your preferences in the settings page of your account.
-          </p>
-        </div>
+        <p>Congratulations on your new position! Here are some tips for your first day:</p>
+        <ul>
+          <li>Arrive 15 minutes early</li>
+          <li>Bring any required documentation</li>
+          <li>Dress professionally</li>
+          <li>Be ready to meet your new team</li>
+        </ul>
+        <p>Best of luck on your first day!</p>
+        <p>Best regards,<br>Your Job Tracker Team</p>
+      </div>
+      <div style="background-color: #f5f5f5; padding: 15px; font-size: 12px; text-align: center; border-radius: 0 0 5px 5px;">
+        <p>This is an automated reminder from your Job Tracker application.</p>
+        <p>You can manage your notification preferences in your account settings.</p>
       </div>
     </div>
   `;
+
+  return await sendEmail({
+    to: email,
+    subject: `Reminder: Your job at ${job.company} starts tomorrow`,
+    html,
+  });
 }

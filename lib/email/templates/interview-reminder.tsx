@@ -1,98 +1,58 @@
 import type {Job} from '@/lib/types';
-import {format} from 'date-fns';
-import type React from 'react';
+import {sendEmail} from '../brevo';
 
-interface InterviewReminderProps {
-  job: Job;
-  userName: string;
-}
+export async function sendInterviewReminder(
+  job: Job,
+  email: string,
+  name: string
+): Promise<boolean> {
+  const interviewDate = new Date(job.interviewDate!);
+  const formattedDate = interviewDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  const formattedTime = interviewDate.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
 
-export const InterviewReminderTemplate: React.FC<InterviewReminderProps> = ({job, userName}) => {
-  const interviewDate = job.interviewDate ? new Date(job.interviewDate) : null;
-  const formattedDate = interviewDate
-    ? format(interviewDate, "EEEE, MMMM d, yyyy 'at' h:mm a")
-    : 'Not specified';
-
-  return (
-    <div>
-      <h1>Interview Reminder</h1>
-      <p>Hello {userName},</p>
-      <p>
-        This is a reminder that you have an interview scheduled for tomorrow with{' '}
-        <strong>{job.company}</strong> for the <strong>{job.position}</strong> position.
-      </p>
-      <div
-        style={{margin: '20px 0', padding: '15px', border: '1px solid #ddd', borderRadius: '5px'}}>
-        <h2>Interview Details</h2>
-        <p>
-          <strong>Company:</strong> {job.company}
-        </p>
-        <p>
-          <strong>Position:</strong> {job.position}
-        </p>
-        <p>
-          <strong>Date & Time:</strong> {formattedDate}
-        </p>
-        {job.location && (
-          <p>
-            <strong>Location:</strong> {job.location}
-          </p>
-        )}
-      </div>
-      <p>Good luck with your interview!</p>
-      <p>
-        <em>
-          You're receiving this email because you've enabled interview reminders in your
-          notification settings. You can update your preferences in the settings page of your
-          account.
-        </em>
-      </p>
-    </div>
-  );
-};
-
-export function renderInterviewReminderEmail(job: Job, userName: string): string {
-  // In a real implementation, you would use a library like React DOM Server
-  // to render this component to an HTML string
-  // For now, we'll return a simplified HTML version
-  const interviewDate = job.interviewDate ? new Date(job.interviewDate) : null;
-  const formattedDate = interviewDate
-    ? format(interviewDate, "EEEE, MMMM d, yyyy 'at' h:mm a")
-    : 'Not specified';
-
-  return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background-color: #f97316; color: white; padding: 20px; text-align: center;">
-        <h1 style="margin: 0;">Interview Reminder</h1>
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+      <div style="background-color: #ff6b35; padding: 15px; border-radius: 5px 5px 0 0;">
+        <h1 style="color: white; margin: 0;">Interview Reminder</h1>
       </div>
       <div style="padding: 20px;">
-        <p>Hello ${userName},</p>
-        <p>
-          This is a reminder that you have an interview scheduled for tomorrow with <strong>${
-            job.company
-          }</strong> for the
-          <strong>${job.position}</strong> position.
-        </p>
-        <div style="margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
-          <h2 style="color: #f97316; margin-top: 0;">Interview Details</h2>
+        <p>Hello ${name},</p>
+        <p>This is a friendly reminder that you have an interview scheduled for tomorrow:</p>
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 15px 0;">
           <p><strong>Company:</strong> ${job.company}</p>
           <p><strong>Position:</strong> ${job.position}</p>
-          <p><strong>Date & Time:</strong> ${formattedDate}</p>
+          <p><strong>Date:</strong> ${formattedDate}</p>
+          <p><strong>Time:</strong> ${formattedTime}</p>
           ${job.location ? `<p><strong>Location:</strong> ${job.location}</p>` : ''}
-          ${
-            job.url
-              ? `<p><a href="${job.url}" style="color: #f97316; text-decoration: none;">View Job Details</a></p>`
-              : ''
-          }
         </div>
-        <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee;">
-          <p>Good luck with your interview!</p>
-          <p style="font-size: 12px; color: #666;">
-            You're receiving this email because you've enabled interview reminders in your notification settings. 
-            You can update your preferences in the settings page of your account.
-          </p>
-        </div>
+        <p>Good luck with your interview! Remember to:</p>
+        <ul>
+          <li>Review the company and position details</li>
+          <li>Prepare questions to ask the interviewer</li>
+          <li>Plan your route to arrive on time</li>
+          <li>Get a good night's sleep</li>
+        </ul>
+        <p>You can view more details about this job application in your dashboard.</p>
+        <p>Best regards,<br>Your Job Tracker Team</p>
+      </div>
+      <div style="background-color: #f5f5f5; padding: 15px; font-size: 12px; text-align: center; border-radius: 0 0 5px 5px;">
+        <p>This is an automated reminder from your Job Tracker application.</p>
+        <p>You can manage your notification preferences in your account settings.</p>
       </div>
     </div>
   `;
+
+  return await sendEmail({
+    to: email,
+    subject: `Interview Reminder: ${job.company} - ${job.position}`,
+    html,
+  });
 }

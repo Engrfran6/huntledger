@@ -1,6 +1,6 @@
 'use client';
 
-import {auth} from '@/lib/firebase';
+import {auth, db} from '@/lib/firebase';
 import {
   createUserWithEmailAndPassword,
   EmailAuthProvider,
@@ -9,6 +9,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
+import {doc, setDoc} from 'firebase/firestore';
 import {useRouter} from 'next/navigation';
 import {useEffect, useState} from 'react';
 import {fetchUserPreferences} from './api';
@@ -34,7 +35,7 @@ export function useSignIn() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const {updatePreferences, preferences} = useUserStore();
+  const {updatePreferences} = useUserStore();
 
   const signIn = async (email: string, password: string) => {
     setError(null);
@@ -44,10 +45,8 @@ export function useSignIn() {
       const success = await signInWithEmailAndPassword(auth, email, password);
 
       if (success) {
-        // Fetch user preferences from database
         const userPrefs = await fetchUserPreferences();
 
-        // Update local preferences with database values
         if (userPrefs) {
           updatePreferences(userPrefs);
         }
@@ -83,30 +82,44 @@ export function useSignUp() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const {updatePreferences, preferences} = useUserStore();
+  const {updatePreferences} = useUserStore();
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, userData = {}) => {
     setError(null);
     setLoading(true);
 
     try {
-      const success = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-      if (success) {
-        // Fetch user preferences from database
-        const userPrefs = await fetchUserPreferences();
+      // Create user document
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        email: email,
+        provider: 'email',
+        createdAt: new Date(),
+        lastLogin: new Date(),
+        userId: auth.currentUser!.uid,
+        ...userData,
+      });
 
-        // Update local preferences with database values
-        if (userPrefs) {
-          updatePreferences(userPrefs);
-        }
-
-        router.push('/choose-mode');
+      // Fetch preferences after account creation
+      const userPrefs = await fetchUserPreferences();
+      if (userPrefs) {
+        updatePreferences(userPrefs);
       }
 
+      router.push('/choose-mode');
       return true;
     } catch (err: any) {
-      setError(err.message);
+      let errorMessage = err.message;
+
+      // More user-friendly error messages
+      if (err.code === 'auth/email-already-in-use') {
+        errorMessage = 'This email is already registered.';
+      } else if (err.code === 'auth/weak-password') {
+        errorMessage = 'Password should be at least 6 characters.';
+      }
+
+      setError(errorMessage);
       console.error('Sign up error:', err);
       return false;
     } finally {

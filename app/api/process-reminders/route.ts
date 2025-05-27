@@ -1,6 +1,7 @@
 // app/api/process-reminders/route.ts
+import {processAllReminders} from '@/lib/email/reminders';
 import {adminAuth} from '@/lib/firebase-admin';
-import {processAllReminders} from '@/lib/reminders/reminder-service';
+
 import {NextRequest, NextResponse} from 'next/server';
 
 export async function POST(req: NextRequest) {

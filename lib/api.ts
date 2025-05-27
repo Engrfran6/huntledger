@@ -379,39 +379,39 @@ export async function fetchNotificationPreferences(): Promise<NotificationPrefer
 
 // REMINDERS
 
-// Save a record of sent reminders to prevent duplicates
-export async function recordSentReminder(
-  type: string,
-  entityId: string,
-  sentAt: Date = new Date()
-): Promise<string> {
-  if (!auth.currentUser) {
-    throw new Error('You must be logged in to view reminder record');
-  }
-  const reminderRef = await addDoc(collection(db, 'sentReminders'), {
-    userId: auth.currentUser.uid,
-    type,
-    entityId,
-    sentAt: sentAt,
-  });
+// // Save a record of sent reminders to prevent duplicates
+// export async function recordSentReminder(
+//   type: string,
+//   entityId: string,
+//   sentAt: Date = new Date()
+// ): Promise<string> {
+//   if (!auth.currentUser) {
+//     throw new Error('You must be logged in to view reminder record');
+//   }
+//   const reminderRef = await addDoc(collection(db, 'sentReminders'), {
+//     userId: auth.currentUser.uid,
+//     type,
+//     entityId,
+//     sentAt: sentAt,
+//   });
 
-  return reminderRef.id;
-}
+//   return reminderRef.id;
+// }
 
-// Check if a reminder has already been sent
-export async function checkReminderSent(type: string, entityId: string): Promise<boolean> {
-  if (!auth.currentUser) {
-    throw new Error('You must be logged to view sent reminders');
-  }
+// // Check if a reminder has already been sent
+// export async function checkReminderSent(type: string, entityId: string): Promise<boolean> {
+//   if (!auth.currentUser) {
+//     throw new Error('You must be logged to view sent reminders');
+//   }
 
-  const remindersRef = collection(db, 'sentReminders');
-  const q = query(
-    remindersRef,
-    where('userId', '==', auth.currentUser.uid),
-    where('type', '==', type),
-    where('entityId', '==', entityId)
-  );
+//   const remindersRef = collection(db, 'sentReminders');
+//   const q = query(
+//     remindersRef,
+//     where('userId', '==', auth.currentUser.uid),
+//     where('type', '==', type),
+//     where('entityId', '==', entityId)
+//   );
 
-  const querySnapshot = await getDocs(q);
-  return !querySnapshot.empty;
-}
+//   const querySnapshot = await getDocs(q);
+//   return !querySnapshot.empty;
+// }

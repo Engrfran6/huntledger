@@ -68,8 +68,11 @@ export default function SignInPage() {
   const onSubmit = async (data: FormData) => {
     const success = await signIn(data.email, data.password);
 
-    if (success)
-      return toast('Signed in successfully!', {description: 'Welcome back to HuntLedger.'});
+    if (success) {
+      return toast.success('Signed in successfully!', {description: 'Welcome back to HuntLedger.'});
+    } else {
+      toast.error('Failed!', {description: `${error || 'Network error'}`});
+    }
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -91,6 +94,7 @@ export default function SignInPage() {
 
   const {updatePreferences, preferences} = useUserStore();
   const router = useRouter();
+
   const handleGoogleSignIn = async () => {
     try {
       const success = await signInWithGoogle();
@@ -218,7 +222,7 @@ export default function SignInPage() {
               )}
             </Button>
 
-            <div className="flex flex-col md:flex-row items-center gap-2 md:justify-between w-full text-sm px-4 ">
+            <div className="flex flex-col md:flex-row items-center gap-2 md:justify-between w-full text-sm px-4">
               <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
                 <DialogTrigger asChild>
                   <Button variant="link" className="text-orange-600 hover:underline p-0 h-auto">
